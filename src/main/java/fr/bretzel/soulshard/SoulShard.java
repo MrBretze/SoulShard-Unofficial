@@ -26,6 +26,8 @@ public class SoulShard {
 
     public static SoulStealer soulStealer;
 
+    public static SoulCreativeTab creativeTab;
+
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
 
@@ -33,6 +35,7 @@ public class SoulShard {
 
         soulConfig = new SoulShardConfig(new File(configDirectory, "Main.cfg"));
 
+        creativeTab = new SoulCreativeTab();
     }
 
     @Mod.EventHandler

@@ -9,7 +9,7 @@ public class SoulStealer extends Enchantment {
 
     public SoulStealer(int id, ResourceLocation location, int max, EnumEnchantmentType type) {
         super(id, location, max, type);
-        this.name = Reference.MODID + ".soul_stealer";
+        setName(Reference.MODID + ".soul_stealer");
     }
 
     @Override
