@@ -3,3 +3,6 @@ enchantment.soulshard.soul_stealer=Soul Stealer
 
 //Creative Tab
 itemGroup.soulshard=Soul Shard
+
+//Block
+tile.soul_cage.name

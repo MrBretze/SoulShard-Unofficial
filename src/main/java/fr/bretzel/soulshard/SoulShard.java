@@ -1,8 +1,10 @@
 package fr.bretzel.soulshard;
 
+import fr.bretzel.soulshard.block.SoulCage;
 import fr.bretzel.soulshard.config.SoulShardConfig;
 
 import fr.bretzel.soulshard.enchantment.SoulStealer;
+import net.minecraft.block.material.Material;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnumEnchantmentType;
 import net.minecraft.util.ResourceLocation;
@@ -10,6 +12,7 @@ import net.minecraftforge.fml.common.FMLLog;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
@@ -25,6 +28,7 @@ public class SoulShard {
     public static SoulShardConfig soulConfig;
 
     public static SoulStealer soulStealer;
+    public static SoulCage soulCage;
 
     public static SoulCreativeTab creativeTab;
 
@@ -49,6 +53,9 @@ public class SoulShard {
 
         this.soulStealer = new SoulStealer(soulID, new ResourceLocation(Reference.MODID + ".soul_stealer"), soulConfig.soulStealerWeight, EnumEnchantmentType.WEAPON);
         Enchantment.addToBookList(soulStealer);
+
+        soulCage = new SoulCage("soul_cage", Material.rock, 3, 15);
+        GameRegistry.registerBlock(soulCage, "soul_cage");
     }
 
     private int getEmptyEnchantId() {
