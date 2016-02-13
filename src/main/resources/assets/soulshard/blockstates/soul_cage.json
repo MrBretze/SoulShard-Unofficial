@@ -1,5 +1,5 @@
 {
   "variants": {
-    "normal": {"model": "soulshard:soul_cage"}
+    "type=unbound_soulcage": {"model": "soulshard:soul_cage"}
   }
 }

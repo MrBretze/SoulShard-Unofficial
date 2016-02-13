@@ -1,6 +1,7 @@
 package fr.bretzel.soulshard;
 
 import fr.bretzel.soulshard.block.SoulCage;
+import fr.bretzel.soulshard.itemblock.SoulCageItemBlockMeta;
 import fr.bretzel.soulshard.config.SoulShardConfig;
 
 import fr.bretzel.soulshard.enchantment.SoulStealer;
@@ -55,7 +56,7 @@ public class SoulShard {
         Enchantment.addToBookList(soulStealer);
 
         soulCage = new SoulCage("soul_cage", Material.rock, 3, 15);
-        GameRegistry.registerBlock(soulCage, "soul_cage");
+        GameRegistry.registerBlock(soulCage, SoulCageItemBlockMeta.class, "soul_cage");
     }
 
     private int getEmptyEnchantId() {

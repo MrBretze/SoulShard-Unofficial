@@ -5,4 +5,6 @@ enchantment.soulshard.soul_stealer=Soul Stealer
 itemGroup.soulshard=Soul Shard
 
 //Block
-tile.soul_cage.name
+tile.soul_cage.unbound_soulcage.name=Soul Cage
+tile.soul_cage.inactive_soulcage.name=Inactive Soul Cage
+tile.soul_cage.active_soulcage.name=Active Soul Cage
