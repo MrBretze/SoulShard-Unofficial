@@ -1,22 +1,14 @@
 package fr.bretzel.soulshard;
 
-import fr.bretzel.soulshard.block.SoulCage;
-import fr.bretzel.soulshard.itemblock.SoulCageItemBlockMeta;
-import fr.bretzel.soulshard.config.SoulShardConfig;
-
-import fr.bretzel.soulshard.enchantment.SoulStealer;
-import net.minecraft.block.material.Material;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnumEnchantmentType;
-import net.minecraft.util.ResourceLocation;
+import fr.bretzel.soulshard.proxy.CommonProxy;
 import net.minecraftforge.fml.common.FMLLog;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.apache.logging.log4j.Logger;
 
-import java.io.File;
 
 @Mod(modid = Reference.MODID, name = Reference.NAME, version = Reference.VERSION, acceptedMinecraftVersions = Reference.MINECRAFT_VERSION)
 public class SoulShard {
@@ -26,45 +18,21 @@ public class SoulShard {
 
     public static Logger soulLog = FMLLog.getLogger();
 
-    public static SoulShardConfig soulConfig;
-
-    public static SoulStealer soulStealer;
-    public static SoulCage soulCage;
-
-    public static SoulCreativeTab creativeTab;
+    @SidedProxy(clientSide = "fr.bretzel.soulshard.proxy.ClientProxy", serverSide = "fr.bretzel.soulshard.proxy.ServerProxy")
+    public static CommonProxy proxy;
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-
-        String configDirectory = event.getModConfigurationDirectory() + File.separator + Reference.NAME + File.separator;
-
-        soulConfig = new SoulShardConfig(new File(configDirectory, "Main.cfg"));
-
-        creativeTab = new SoulCreativeTab();
+        proxy.preInit(event);
     }
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
-        int soulID = soulConfig.soulStealerID;
-
-        if (Enchantment.getEnchantmentById(soulID) != null) {
-            soulID = getEmptyEnchantId();
-            soulLog.warn("The Soul Stealer enchantment is already registered, a new id is set ! (NEW ID: " + soulID + ").");
-        }
-
-        this.soulStealer = new SoulStealer(soulID, new ResourceLocation(Reference.MODID + ".soul_stealer"), soulConfig.soulStealerWeight, EnumEnchantmentType.WEAPON);
-        Enchantment.addToBookList(soulStealer);
-
-        soulCage = new SoulCage("soul_cage", Material.rock, 3, 15);
-        GameRegistry.registerBlock(soulCage, SoulCageItemBlockMeta.class, "soul_cage");
+        proxy.init(event);
     }
 
-    private int getEmptyEnchantId() {
-        for (int i = 0; i < 256; i++) {
-            if(Enchantment.getEnchantmentById(i) == null) {
-                return i;
-            }
-        }
-        return -1;
+    @Mod.EventHandler
+    public void postIni(FMLPostInitializationEvent event) {
+        proxy.postInit(event);
     }
 }

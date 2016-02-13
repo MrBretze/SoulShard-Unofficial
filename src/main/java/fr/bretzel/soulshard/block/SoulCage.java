@@ -3,6 +3,7 @@ package fr.bretzel.soulshard.block;
 
 import fr.bretzel.soulshard.SoulShard;
 import fr.bretzel.soulshard.block.meta.IMetaBlockName;
+import fr.bretzel.soulshard.register.Common;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyEnum;
@@ -22,13 +23,16 @@ public class SoulCage extends Block implements IMetaBlockName {
 
     public static final PropertyEnum METADATA = PropertyEnum.create("type", SoulCage.EnumType.class);
 
+    public String resource_name = "";
+
     public SoulCage(String unlocalizedName, Material material, float hardness, float resistance) {
         super(material);
 
+        resource_name = unlocalizedName;
         this.setUnlocalizedName(unlocalizedName);
         this.setHardness(hardness);
         this.setResistance(resistance);
-        this.setCreativeTab(SoulShard.creativeTab);
+        this.setCreativeTab(Common.creativeTab);
         this.setDefaultState(this.blockState.getBaseState().withProperty(METADATA, EnumType.UNBOUND_SOULCAGE));
     }
 
@@ -80,7 +84,7 @@ public class SoulCage extends Block implements IMetaBlockName {
 
     @Override
     public ItemStack getPickBlock(MovingObjectPosition target, World world, BlockPos pos) {
-        return new ItemStack(Item.getItemFromBlock(this), 1, this.getMetaFromState(world.getBlockState(pos)));
+        return new ItemStack(Item.getItemFromBlock(this), 1,0);
     }
 
     public static enum EnumType implements IStringSerializable {
