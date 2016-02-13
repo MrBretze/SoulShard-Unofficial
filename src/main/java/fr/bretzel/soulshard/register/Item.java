@@ -3,16 +3,19 @@ package fr.bretzel.soulshard.register;
 import fr.bretzel.soulshard.Reference;
 import fr.bretzel.soulshard.SoulShard;
 import fr.bretzel.soulshard.enchantment.SoulStealer;
+import fr.bretzel.soulshard.item.SoulShardItem;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnumEnchantmentType;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class Item {
 
     public static SoulStealer soulStealer;
+    public static SoulShardItem soulShard;
 
     public static void registerItem() {
-
+        GameRegistry.registerItem(soulShard = new SoulShardItem(), "soul_shard");
     }
 
     public static void registerEnchantems() {
@@ -23,8 +26,7 @@ public class Item {
             SoulShard.soulLog.warn("The Soul Stealer enchantment is already registered, a new id is set ! (NEW ID: " + soulID + ").");
         }
 
-        soulStealer = new SoulStealer(soulID, new ResourceLocation(Reference.MODID + ".soul_stealer"), Common.soulConfig.soulStealerWeight, EnumEnchantmentType.WEAPON);
-        Enchantment.addToBookList(soulStealer);
+        Enchantment.addToBookList(soulStealer = new SoulStealer(soulID, new ResourceLocation(Reference.MODID + ".soul_stealer"), Common.soulConfig.soulStealerWeight, EnumEnchantmentType.WEAPON));
     }
 
     private static int getEmptyEnchantId() {

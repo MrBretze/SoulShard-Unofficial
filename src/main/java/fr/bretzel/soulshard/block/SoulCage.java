@@ -4,15 +4,22 @@ package fr.bretzel.soulshard.block;
 import fr.bretzel.soulshard.SoulShard;
 import fr.bretzel.soulshard.block.meta.IMetaBlockName;
 import fr.bretzel.soulshard.register.Common;
+import fr.bretzel.soulshard.tileentity.SoulCageTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
@@ -85,6 +92,51 @@ public class SoulCage extends Block implements IMetaBlockName {
     @Override
     public ItemStack getPickBlock(MovingObjectPosition target, World world, BlockPos pos) {
         return new ItemStack(Item.getItemFromBlock(this), 1,0);
+    }
+
+    @Override
+    public TileEntity createTileEntity(World world, IBlockState state) {
+        return new SoulCageTileEntity(world, this, state);
+    }
+
+    @Override
+    public boolean onBlockActivated(World world, BlockPos blockPos, IBlockState state, EntityPlayer player, EnumFacing facing, float par7, float par8, float par9) {
+        if (!world.isRemote) {
+
+            SoulCageTileEntity tile = (SoulCageTileEntity) world.getTileEntity(blockPos);
+
+            if (tile != null) {
+
+                if (player.getHeldItem() != null && player.getHeldItem().getItem() == fr.bretzel.soulshard.register.Item.soulShard) {
+
+                    ItemStack stack = player.getHeldItem();
+
+                    if (stack.hasTagCompound()) {
+
+                        NBTTagCompound compound = stack.getTagCompound();
+                        int tier = compound.getInteger("Tier");
+                        String entName = compound.getString("EntityType");
+
+                        if (tier == 0 || entName.isEmpty() || entName.equals("empty"))
+                            return false;
+
+                        tile.setInventorySlotContents(0, stack);
+                        tile.owner = player.getUniqueID();
+
+                        if(!player.capabilities.isCreativeMode)
+                            stack.stackSize--;
+                    }
+                }
+
+                if (player.isSneaking() && player.getHeldItem() == null) {
+                    if (tile.soul_shard != null) {
+                        Entity entity = new EntityItem(world, blockPos.getX(), blockPos.getY(), blockPos.getZ(), tile.soul_shard);
+                        world.spawnEntityInWorld(entity);
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     public static enum EnumType implements IStringSerializable {
