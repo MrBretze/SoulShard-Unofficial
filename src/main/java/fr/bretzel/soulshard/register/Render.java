@@ -8,6 +8,8 @@ public class Render {
 
     public static void registerRender() {
         addBlockRender(Block.soulCage, 0, Reference.MODID + ":soulcage_unbound", "inventory");
+        addBlockRender(Block.soulCage, 1, Reference.MODID + ":inactive_soulcage", "inventory");
+        addBlockRender(Block.soulCage, 2, Reference.MODID + ":active_soulcage", "inventory");
     }
 
     public static void addBlockRender(net.minecraft.block.Block block, int metadata, String blockString, String location) {
