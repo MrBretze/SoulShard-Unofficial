@@ -18,7 +18,7 @@ public class SoulShard {
 
     public static Logger soulLog = FMLLog.getLogger();
 
-    @SidedProxy(clientSide = "fr.bretzel.soulshard.proxy.ClientProxy", serverSide = "fr.bretzel.soulshard.proxy.ServerProxy")
+    @SidedProxy(clientSide = "fr.bretzel.soulshard.proxy.ClientProxy", serverSide = "fr.bretzel.soulshard.proxy.CommonProxy")
     public static CommonProxy proxy;
 
     @Mod.EventHandler

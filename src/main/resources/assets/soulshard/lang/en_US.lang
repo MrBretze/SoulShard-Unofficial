@@ -1,10 +1,19 @@
 //Enchants
-enchantment.soulshard.soul_stealer=Soul Stealer
+enchantment.soul_shard.soul_stealer=Soul Stealer
 
 //Creative Tab
-itemGroup.soulshard=Soul Shard
+itemGroup.soul_shard=Soul Shard
 
 //Block
 tile.soul_cage.unbound_soulcage.name=Soul Cage
 tile.soul_cage.inactive_soulcage.name=Inactive Soul Cage
 tile.soul_cage.active_soulcage.name=Active Soul Cage
+
+//Items
+item.soul_shard.unbound.name=Unbound SoulShard
+item.soul_shard.tier0.name=SoulShard Tier 0
+item.soul_shard.tier1.name=SoulShard Tier 1
+item.soul_shard.tier2.name=SoulShard Tier 2
+item.soul_shard.tier3.name=SoulShard Tier 3
+item.soul_shard.tier4.name=SoulShard Tier 4
+item.soul_shard.tier5.name=SoulShard Tier 5

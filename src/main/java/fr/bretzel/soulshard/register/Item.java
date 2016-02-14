@@ -15,7 +15,7 @@ public class Item {
     public static SoulShardItem soulShard;
 
     public static void registerItem() {
-        GameRegistry.registerItem(soulShard = new SoulShardItem(), "soul_shard");
+        GameRegistry.registerItem(soulShard = new SoulShardItem("soul_shard"), "soul_shard");
     }
 
     public static void registerEnchantems() {

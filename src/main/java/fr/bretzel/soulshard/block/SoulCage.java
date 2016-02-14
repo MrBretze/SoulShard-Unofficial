@@ -1,7 +1,6 @@
 package fr.bretzel.soulshard.block;
 
 
-import fr.bretzel.soulshard.SoulShard;
 import fr.bretzel.soulshard.block.meta.IMetaBlockName;
 import fr.bretzel.soulshard.register.Common;
 import fr.bretzel.soulshard.tileentity.SoulCageTileEntity;
@@ -66,7 +65,7 @@ public class SoulCage extends Block implements IMetaBlockName {
     @Override
     public int getMetaFromState(IBlockState state) {
         EnumType type = (EnumType) state.getValue(METADATA);
-        return type.getId();
+        return type.getDamage();
     }
 
     @Override
@@ -77,15 +76,10 @@ public class SoulCage extends Block implements IMetaBlockName {
     @Override
     public String getSpecialName(ItemStack stack) {
         int damage = stack.getItemDamage();
-        if (damage == 0)
-            return EnumType.UNBOUND_SOULCAGE.getName();
-
-        if (damage == 1)
-            return EnumType.INACTIVE_SOULCAGE.getName();
-
-        if (damage == 2)
-            return EnumType.ACTIVE_SOULCAGE.getName();
-
+        for (EnumType type : EnumType.META_LOOKUP) {
+            if (type.getDamage() == damage)
+                return type.name;
+        }
         return EnumType.UNBOUND_SOULCAGE.getName();
     }
 
@@ -145,7 +139,7 @@ public class SoulCage extends Block implements IMetaBlockName {
         INACTIVE_SOULCAGE(1, "inactive_soulcage"),
         ACTIVE_SOULCAGE(2, "active_soulcage");
 
-        private int id;
+        private int damage;
         private String name;
         private static EnumType[] META_LOOKUP;
 
@@ -159,7 +153,7 @@ public class SoulCage extends Block implements IMetaBlockName {
         }
 
         private EnumType(int id, String name) {
-            this.id = id;
+            this.damage = id;
             this.name = name;
         }
 
@@ -173,8 +167,8 @@ public class SoulCage extends Block implements IMetaBlockName {
             return getName();
         }
 
-        public int getId() {
-            return id;
+        public int getDamage() {
+            return damage;
         }
 
         public static EnumType byMetadata(int meta) {

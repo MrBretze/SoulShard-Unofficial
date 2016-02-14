@@ -1,6 +1,5 @@
 package fr.bretzel.soulshard.enchantment;
 
-import fr.bretzel.soulshard.Reference;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnumEnchantmentType;
 import net.minecraft.util.ResourceLocation;
@@ -9,7 +8,7 @@ public class SoulStealer extends Enchantment {
 
     public SoulStealer(int id, ResourceLocation location, int max, EnumEnchantmentType type) {
         super(id, location, max, type);
-        setName(Reference.MODID + ".soul_stealer");
+        setName("soul_shard.soul_stealer");
     }
 
     @Override
