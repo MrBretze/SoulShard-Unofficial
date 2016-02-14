@@ -26,9 +26,4 @@ public class SoulCageItemBlockMeta extends ItemBlock {
         return super.getUnlocalizedName(stack) + "." + ((IMetaBlockName) this.block).getSpecialName(stack);
     }
 
-    @Override
-    public String getItemStackDisplayName(ItemStack p_getItemStackDisplayName_1_) {
-        //TODO: Display Entity name
-        return super.getItemStackDisplayName(p_getItemStackDisplayName_1_);
-    }
 }

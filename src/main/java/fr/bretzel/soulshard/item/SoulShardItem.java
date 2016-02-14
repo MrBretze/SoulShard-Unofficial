@@ -7,6 +7,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IStringSerializable;
+import net.minecraftforge.fml.common.registry.LanguageRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -14,29 +15,36 @@ import java.util.List;
 
 public class SoulShardItem extends Item {
 
+    public String resource_name = "";
 
     public SoulShardItem(String unlocalizedName) {
         this.setUnlocalizedName(unlocalizedName);
+        this.resource_name = unlocalizedName;
 
         this.setMaxStackSize(1);
         this.setCreativeTab(Common.creativeTab);
         this.setHasSubtypes(true);
     }
 
-    @Override
-    public String getItemStackDisplayName(ItemStack stack) {
-        NBTTagCompound compound = stack.getTagCompound();
-        if (compound != null && compound.hasKey("EntityType") && !compound.getString("EntityType").equals("empty"))
-            return super.getItemStackDisplayName(stack) + "(" + EnumChatFormatting.DARK_PURPLE + compound.getString("EntityType") + EnumChatFormatting.RESET + ")";
-        return super.getItemStackDisplayName(stack);
-    }
 
     @Override
     public String getUnlocalizedName(ItemStack stack) {
         int damage = stack.getItemDamage();
         for (EnumType type : EnumType.META_LOOKUP) {
             if (type.getDamage() == damage) {
-                return super.getUnlocalizedName(stack) + "." + type.getName();
+                if (stack.hasTagCompound()) {
+                    NBTTagCompound compound = stack.getTagCompound();
+                    if (compound.hasKey("EntityType")) {
+                        if (compound.getString("EntityType").isEmpty() || compound.getString("EntityType").equals("empty")) {
+                            return super.getUnlocalizedName(stack) + "." + type.getName();
+                        } else {
+                            return super.getUnlocalizedName(stack) + "." + type.getName() +
+                                    "(" + EnumChatFormatting.DARK_PURPLE  + compound.getString("EntityType") + EnumChatFormatting.RESET + ")";
+                        }
+                    }
+                } else {
+                    return super.getUnlocalizedName(stack) + "." + type.getName();
+                }
             }
         }
         return super.getUnlocalizedName(stack);
