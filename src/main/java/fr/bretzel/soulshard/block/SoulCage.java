@@ -2,7 +2,8 @@ package fr.bretzel.soulshard.block;
 
 
 import fr.bretzel.soulshard.block.meta.IMetaBlockName;
-import fr.bretzel.soulshard.register.Common;
+import fr.bretzel.soulshard.registry.CommonRegistry;
+import fr.bretzel.soulshard.registry.ItemRegistry;
 import fr.bretzel.soulshard.tileentity.SoulCageTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -38,7 +39,7 @@ public class SoulCage extends Block implements IMetaBlockName {
         this.setUnlocalizedName(unlocalizedName);
         this.setHardness(hardness);
         this.setResistance(resistance);
-        this.setCreativeTab(Common.creativeTab);
+        this.setCreativeTab(CommonRegistry.creativeTab);
         this.setDefaultState(this.blockState.getBaseState().withProperty(METADATA, EnumType.UNBOUND_SOULCAGE));
     }
 
@@ -101,7 +102,7 @@ public class SoulCage extends Block implements IMetaBlockName {
 
             if (tile != null) {
 
-                if (player.getHeldItem() != null && player.getHeldItem().getItem() == fr.bretzel.soulshard.register.Item.soulShard) {
+                if (player.getHeldItem() != null && player.getHeldItem().getItem() == ItemRegistry.soulShard) {
 
                     ItemStack stack = player.getHeldItem();
 

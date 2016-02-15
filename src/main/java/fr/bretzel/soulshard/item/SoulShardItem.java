@@ -1,6 +1,6 @@
 package fr.bretzel.soulshard.item;
 
-import fr.bretzel.soulshard.register.Common;
+import fr.bretzel.soulshard.registry.CommonRegistry;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -19,7 +19,7 @@ public class SoulShardItem extends Item {
         this.setUnlocalizedName(unlocalizedName);
 
         this.setMaxStackSize(1);
-        this.setCreativeTab(Common.creativeTab);
+        this.setCreativeTab(CommonRegistry.creativeTab);
         this.setHasSubtypes(true);
     }
 

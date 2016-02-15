@@ -1,4 +1,4 @@
-package fr.bretzel.soulshard.register;
+package fr.bretzel.soulshard.registry;
 
 import fr.bretzel.soulshard.block.SoulCage;
 import fr.bretzel.soulshard.itemblock.SoulCageItemBlockMeta;
@@ -6,7 +6,7 @@ import fr.bretzel.soulshard.tileentity.SoulCageTileEntity;
 import net.minecraft.block.material.Material;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-public class Block {
+public class BlockRegistry {
 
     public static SoulCage soulCage;
 

@@ -1,6 +1,6 @@
 package fr.bretzel.soulshard.proxy;
 
-import fr.bretzel.soulshard.register.Render;
+import fr.bretzel.soulshard.registry.RenderRegistry;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -10,7 +10,7 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void preInit(FMLPreInitializationEvent e) {
         super.preInit(e);
-        Render.registerRender();
+        RenderRegistry.registerRender();
     }
 
     @Override

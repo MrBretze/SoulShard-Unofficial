@@ -26,6 +26,10 @@ public abstract class IConfig {
         return configuration;
     }
 
+    public void setConfiguration(Configuration configuration) {
+        this.configuration = configuration;
+    }
+
     public File getFile() {
         return file;
     }

@@ -1,7 +1,7 @@
 package fr.bretzel.soulshard.tileentity;
 
 import fr.bretzel.soulshard.block.SoulCage;
-import fr.bretzel.soulshard.register.Item;
+import fr.bretzel.soulshard.registry.ItemRegistry;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -54,8 +54,8 @@ public class SoulCageTileEntity extends TileEntity implements IInventory {
     public ItemStack decrStackSize(int i, int j) {
         if (j == 0) return null;
 
-        //ItemStack stack = new ItemStack(Item.soulShard, 1, soul_shard.getItemDamage());
-        ItemStack stack = new ItemStack(Item.soulShard, 0x1);
+        //ItemStack stack = new ItemStack(ItemRegistry.soulShard, 1, soul_shard.getItemDamage());
+        ItemStack stack = new ItemStack(ItemRegistry.soulShard, 0x1);
         stack.setTagCompound(soul_shard.getTagCompound());
         setInventorySlotContents(i, null);
         return stack;
@@ -93,7 +93,7 @@ public class SoulCageTileEntity extends TileEntity implements IInventory {
 
     @Override
     public boolean isItemValidForSlot(int i, ItemStack stack) {
-        if (stack.getItem() != Item.soulShard || !stack.hasTagCompound()) return false;
+        if (stack.getItem() != ItemRegistry.soulShard || !stack.hasTagCompound()) return false;
         NBTTagCompound nbt = stack.getTagCompound();
         return (soul_shard == null && nbt.getInteger("Tier") > 0 && !nbt.getString("EntityType").equals("empty"));
     }

@@ -7,6 +7,7 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import org.apache.logging.log4j.Logger;
 
 
@@ -17,6 +18,7 @@ public class SoulShard {
     public static SoulShard instance;
 
     public static Logger soulLog = FMLLog.getLogger();
+    public static MobMapping mobMapping;
 
     @SidedProxy(clientSide = "fr.bretzel.soulshard.proxy.ClientProxy", serverSide = "fr.bretzel.soulshard.proxy.CommonProxy")
     public static CommonProxy proxy;
@@ -34,5 +36,10 @@ public class SoulShard {
     @Mod.EventHandler
     public void postIni(FMLPostInitializationEvent event) {
         proxy.postInit(event);
+    }
+
+    @Mod.EventHandler
+    public void loadWorld(FMLServerStartingEvent event) {
+        proxy.loadWorld(event);
     }
 }
