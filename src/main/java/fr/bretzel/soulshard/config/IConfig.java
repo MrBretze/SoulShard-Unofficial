@@ -33,23 +33,4 @@ public abstract class IConfig {
     public File getFile() {
         return file;
     }
-
-    public void load() {
-        isLoaded = false;
-        configuration.load();
-        isLoaded = true;
-    }
-
-    public void reload() {
-        isLoaded = false;
-        configuration.save();
-        configuration = null;
-        configuration = new Configuration(file);
-        configuration.load();
-        isLoaded = true;
-    }
-
-    public boolean isLoaded() {
-        return isLoaded && configuration != null;
-    }
 }

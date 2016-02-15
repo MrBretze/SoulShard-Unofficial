@@ -1,7 +1,11 @@
 package fr.bretzel.soulshard.item;
 
+import fr.bretzel.soulshard.SoulShard;
 import fr.bretzel.soulshard.registry.CommonRegistry;
+import fr.bretzel.soulshard.tier.TierHelper;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -27,7 +31,7 @@ public class SoulShardItem extends Item {
     public String getItemStackDisplayName(ItemStack stack) {
         NBTTagCompound compound = stack.getTagCompound();
         if (compound != null && compound.hasKey("EntityType") && !compound.getString("EntityType").equals("empty"))
-            return super.getItemStackDisplayName(stack) + "(" + EnumChatFormatting.DARK_PURPLE + compound.getString("EntityType") + EnumChatFormatting.RESET + ")";
+            return super.getItemStackDisplayName(stack) + " (" + EnumChatFormatting.DARK_PURPLE + compound.getString("EntityType") + EnumChatFormatting.RESET + ")";
         return super.getItemStackDisplayName(stack);
     }
 
@@ -46,7 +50,7 @@ public class SoulShardItem extends Item {
     public void getSubItems(Item itemIn, CreativeTabs tab, List subItems) {
         for (EnumType type : EnumType.META_LOOKUP) {
             ItemStack stack = new ItemStack(itemIn, 1, type.getDamage());
-            if (type != EnumType.UNBOUND && !stack.hasTagCompound()) {
+            if (!stack.hasTagCompound()) {
                 //TODO: USE TierHelper.class
                 NBTTagCompound compound = new NBTTagCompound();
                 compound.setString("EntityType", "empty");
@@ -55,9 +59,6 @@ public class SoulShardItem extends Item {
                 stack.setTagCompound(compound);
                 subItems.add(stack);
             }
-            if (type == EnumType.UNBOUND) {
-                subItems.add(new ItemStack(itemIn, 1, EnumType.UNBOUND.getDamage()));
-            }
         }
     }
 
@@ -65,6 +66,81 @@ public class SoulShardItem extends Item {
     @SideOnly(Side.CLIENT)
     public boolean hasEffect(ItemStack stack) {
         return stack.getItemDamage() == 6;
+    }
+
+    public static void boundEntity(EntityLiving entityLiving, ItemStack stack) {
+        if (!isSoulShard(stack))
+            return;
+
+        if (isBound(stack))
+            return;
+
+        if (SoulShard.mobMapping.isMobBlackListed(entityLiving))
+            return;
+
+        NBTTagCompound compound = new NBTTagCompound();
+
+        if (stack.getItemDamage() == EnumType.UNBOUND.getDamage()) {
+            stack.setTagCompound(new NBTTagCompound());
+            stack.getTagCompound().setInteger("KillCount", 0);
+            stack.getTagCompound().setString("EntityType", "empty");
+            stack.getTagCompound().setInteger("Tier", 0);
+            stack.setItemDamage(1);
+        }
+
+        if (stack.getItemDamage() != EnumType.UNBOUND.getDamage()) {
+
+            entityLiving.writeEntityToNBT(compound);
+
+            stack.getTagCompound().setTag("EntitySaved", compound);
+            stack.getTagCompound().setString("EntityType", SoulShard.mobMapping.getEntityType(entityLiving));
+        }
+    }
+
+    public static void increaseShardKillCount(ItemStack stack, int kill) {
+
+        if (!stack.hasTagCompound())
+            return;
+
+        if (!stack.getTagCompound().hasKey("KillCount"))
+            return;
+
+        stack.getTagCompound().setInteger("KillCount", stack.getTagCompound().getInteger("KillCount") + kill);
+
+        TierHelper.checkShard(stack);
+    }
+
+    public static String getEntityTypeFromStack(ItemStack stack) {
+        if (stack.hasTagCompound() && stack.getTagCompound().hasKey("EntityType") && !stack.getTagCompound().getString("EntityType").equals("empty")) {
+            return stack.getTagCompound().getString("EntityType");
+        }
+
+        return "empty";
+    }
+
+    public static boolean isBound(ItemStack stack) {
+        return stack.hasTagCompound() && stack.getTagCompound().hasKey("EntityType") && !stack.getTagCompound().getString("EntityType").equals("empty");
+    }
+
+    public static ItemStack getShardFromInventory(EntityPlayer player, String entity) {
+        ItemStack lastResort = null;
+        for (int i = 0; i <= 8; i++) {
+            ItemStack stack = player.inventory.getStackInSlot(i);
+
+            if (stack != null && stack.getItem() instanceof SoulShardItem && stack.getTagCompound().getInteger("KillCount") <= TierHelper.MAX_MOB_KILL) {
+                if (!isBound(stack) && lastResort == null) {
+                    lastResort = stack;
+                } else if (getEntityTypeFromStack(stack).equals(entity)){
+                    return stack;
+                }
+            }
+        }
+
+        return lastResort;
+    }
+
+    public static boolean isSoulShard(ItemStack stack) {
+        return stack.getItem() instanceof SoulShardItem;
     }
 
     public static enum EnumType implements IStringSerializable {

@@ -17,3 +17,7 @@ item.soul_shard.tier2.name=SoulShard Tier 2
 item.soul_shard.tier3.name=SoulShard Tier 3
 item.soul_shard.tier4.name=SoulShard Tier 4
 item.soul_shard.tier5.name=SoulShard Tier 5
+
+//ToolTip
+tooltip.soul_shard.tier=Tier
+tooltip.soul_shard.killCount=Kills

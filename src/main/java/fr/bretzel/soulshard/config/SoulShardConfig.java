@@ -28,17 +28,8 @@ public class SoulShardConfig extends IConfig{
         SoulShard.soulLog.info("Soul Shard has successful loaded " + file.getName());
     }
 
-    @Override
     public void load() {
-        super.load();
-        try {
-            getConfiguration().load();
 
-        } catch (Exception e) {
-            SoulShard.soulLog.catching(e);
-        } finally {
-            if (getConfiguration().hasChanged())
-                getConfiguration().save();
-        }
     }
+
 }

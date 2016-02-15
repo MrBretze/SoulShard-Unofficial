@@ -5,12 +5,13 @@ import fr.bretzel.soulshard.registry.CommonRegistry;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.boss.IBossDisplayData;
 import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
 
 import java.io.File;
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -20,7 +21,6 @@ public class MobMapping {
 
     private ArrayList<String> blackList = new ArrayList<String>();
     private ArrayList<String> entityList = new ArrayList<String>();
-    private ArrayList<String> whitelist = new ArrayList<String>();
 
     private MobConfig config;
 
@@ -31,8 +31,27 @@ public class MobMapping {
         loadEntityList();
 
         config = new MobConfig(new File(CommonRegistry.configDirectory, "Mob.cfg"));
-        config.load();
+        config.getConfiguration().load();
         loadConfig();
+    }
+
+    public boolean isMobBlackListed(String name) {
+        return blackList.contains(name);
+    }
+
+    public boolean isMobBlackListed(EntityLiving entityLiving) {
+        return entityLiving.hasCustomName() ? isMobBlackListed(EntityList.getEntityString(entityLiving)) : isMobBlackListed(entityLiving.getName());
+    }
+
+    public String getEntityType(EntityLiving entityLiving) {
+        String name = EntityList.getEntityString(entityLiving);
+        if (entityList.contains(name))
+            return name;
+        else {
+            name = (String) ((HashMap) EntityList.classToStringMapping).get(entityLiving.getClass());
+            SoulShard.soulLog.info("New EntityType is detected " + name + ".");
+            return name;
+        }
     }
 
     private void loadConfig() {
@@ -54,68 +73,40 @@ public class MobMapping {
             }
 
         } catch (Exception e) {
-            SoulShard.soulLog.fatal("Soul-Shards 3 had a problem loading it's configuration files.");
+            SoulShard.soulLog.fatal("SoulShard: Had a problem loading it's configuration files.");
         } finally {
             config.setConfiguration(configuration);
-            config.reload();
             config.getConfiguration().save();
         }
     }
 
     private void loadEntityList() {
-        Map<Class<? extends Entity>, String> map = EntityList.classToStringMapping;
-        Iterator<Class<? extends Entity>> iter = map.keySet().iterator();
 
-        while (iter.hasNext()) {
-            Class ent = iter.next();
-            String entName = map.get(ent);
-
-            if (entName.equals("Monster") || entName.equals("Mob")) continue;
-
-            Entity entity = createEntityFromName(ent, entName);
-
-            if (entity instanceof EntityLiving) {
-                SoulShard.soulLog.info("SoulShard: Loaded mob: " + entName);
-
-                EntityLiving living = (EntityLiving) entity;
-                String name = living.getCommandSenderEntity().getName();
-
-                if (!blackList.contains(name)) {
-                    entityList.add(name);
+        for (Map.Entry<Class<? extends Entity>, String> entry : EntityList.classToStringMapping.entrySet()) {
+            if (entityList.contains(entry.getValue())) {
+                SoulShard.soulLog.info("SoulShard: Skipping mapping for " + entry.getValue() + ": already mapped.");
+            } else if (IBossDisplayData.class.isAssignableFrom(entry.getKey())) {
+                SoulShard.soulLog.info("SoulShard: Skipping mapping for " + entry.getValue() + ": detected as boss.");
+                blackList.add(entry.getValue());
+            } else if (EntityLiving.class.isAssignableFrom(entry.getKey())) {
+                if (SoulShard.debug) {
+                    SoulShard.soulLog.info("SoulShard: Mapped new entity " + entry.getValue());
                 }
+                entityList.add(entry.getValue());
             }
         }
+
+        entityList.add("Wither Skeleton");
+        SoulShard.soulLog.info("===================================================");
+        SoulShard.soulLog.info("==================== SOULSHARD ====================");
+        SoulShard.soulLog.info("===================================================");
+        SoulShard.soulLog.info("============== TOTAL ENTITY MAPPED: " + entityList.size() + " ============");
+        SoulShard.soulLog.info("===================================================");
     }
 
-    /**
-     * SoulShard Reborn
-     */
     private void loadDefaultBlackList() {
-        blackList.add("EnderDragon");
         blackList.add("Giant");
         blackList.add("Monster");
-        blackList.add("WitherBoss");
-    }
-
-
-    /**
-     * SoulShard Reborn
-     */
-    private Entity createEntityFromName(Class entClass, String name) {
-        if (!EntityLiving.class.isAssignableFrom(entClass)) return null;
-
-        Entity entity = null;
-
-        try {
-
-            Constructor c = entClass.getConstructor(World.class);
-            entity = (EntityLiving) c.newInstance(getWorld());
-
-        } catch (Exception e) {
-            SoulShard.soulLog.fatal("SoulShard: Skipping entity mapping for: " + name);
-            SoulShard.soulLog.fatal("Please report this to dev: " + e.toString());
-        }
-        return entity;
     }
 
     public World getWorld() {
