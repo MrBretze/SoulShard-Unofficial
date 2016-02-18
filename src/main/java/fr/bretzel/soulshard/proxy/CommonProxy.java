@@ -6,6 +6,7 @@ import fr.bretzel.soulshard.event.KillEvent;
 import fr.bretzel.soulshard.registry.BlockRegistry;
 import fr.bretzel.soulshard.registry.CommonRegistry;
 import fr.bretzel.soulshard.registry.ItemRegistry;
+import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -21,9 +22,9 @@ public class CommonProxy {
         CommonRegistry.registerConfig(e);
         CommonRegistry.register();
 
+        BlockRegistry.registerBlock();
         ItemRegistry.registerEnchantems();
         ItemRegistry.registerItem();
-        BlockRegistry.registerBlock();
     }
 
     public void init(FMLInitializationEvent e) {
@@ -35,6 +36,13 @@ public class CommonProxy {
     }
 
     public void loadWorld(FMLServerStartingEvent event) {
-        SoulShard.mobMapping = new MobMapping(event.getServer().getEntityWorld());
+        SoulShard.mobMapping = getMapping(event.getServer().getEntityWorld());
+    }
+
+    public MobMapping getMapping(World world) {
+        if (!MobMapping.isLoaded()) {
+            return new MobMapping(world);
+        }
+        return SoulShard.mobMapping;
     }
 }

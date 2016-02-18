@@ -1,6 +1,7 @@
 package fr.bretzel.soulshard.event;
 
 import fr.bretzel.soulshard.SoulShard;
+import fr.bretzel.soulshard.Utils;
 import fr.bretzel.soulshard.item.SoulShardItem;
 import fr.bretzel.soulshard.registry.ItemRegistry;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -40,8 +41,8 @@ public class KillEvent {
 
         if (shardItem != null) {
 
-            if (!SoulShardItem.isBound(shardItem)) {
-                SoulShardItem.boundEntity(dead, shardItem);
+            if (!Utils.isBound(shardItem)) {
+                Utils.boundEntity(dead, shardItem);
             }
 
             int soulStealer = EnchantmentHelper.getEnchantmentLevel(ItemRegistry.soulStealer.effectId, player.getHeldItem());

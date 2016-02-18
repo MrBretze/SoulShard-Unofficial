@@ -24,15 +24,21 @@ public class MobMapping {
 
     private MobConfig config;
 
+    private static boolean loaded = false;
+
     public MobMapping(World world) {
-        this.world = world;
+        if (!isLoaded()) {
+            this.world = world;
 
-        loadDefaultBlackList();
-        loadEntityList();
+            loadDefaultBlackList();
+            loadEntityList();
 
-        config = new MobConfig(new File(CommonRegistry.configDirectory, "Mob.cfg"));
-        config.getConfiguration().load();
-        loadConfig();
+            config = new MobConfig(new File(CommonRegistry.configDirectory, "Mob.cfg"));
+            config.getConfiguration().load();
+            loadConfig();
+
+            loaded = true;
+        }
     }
 
     public boolean isMobBlackListed(String name) {
@@ -41,6 +47,10 @@ public class MobMapping {
 
     public boolean isMobBlackListed(EntityLiving entityLiving) {
         return entityLiving.hasCustomName() ? isMobBlackListed(EntityList.getEntityString(entityLiving)) : isMobBlackListed(entityLiving.getName());
+    }
+
+    public static boolean isLoaded() {
+        return loaded;
     }
 
     public String getEntityType(EntityLiving entityLiving) {
@@ -98,9 +108,11 @@ public class MobMapping {
 
         entityList.add("Wither Skeleton");
         SoulShard.soulLog.info("===================================================");
-        SoulShard.soulLog.info("==================== SOULSHARD ====================");
+        SoulShard.soulLog.info("=================== SOUL SHARD ====================");
         SoulShard.soulLog.info("===================================================");
         SoulShard.soulLog.info("============== TOTAL ENTITY MAPPED: " + entityList.size() + " ============");
+        SoulShard.soulLog.info("===================================================");
+        SoulShard.soulLog.info("============= BLACKLISTED ENTITY: " + blackList.size() + " =================");
         SoulShard.soulLog.info("===================================================");
     }
 

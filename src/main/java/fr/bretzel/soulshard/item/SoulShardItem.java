@@ -1,14 +1,11 @@
 package fr.bretzel.soulshard.item;
 
-import fr.bretzel.soulshard.SoulShard;
 import fr.bretzel.soulshard.registry.CommonRegistry;
-import fr.bretzel.soulshard.tier.TierHelper;
+import fr.bretzel.soulshard.Utils;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IStringSerializable;
 import net.minecraftforge.fml.relauncher.Side;
@@ -29,9 +26,10 @@ public class SoulShardItem extends Item {
 
     @Override
     public String getItemStackDisplayName(ItemStack stack) {
-        NBTTagCompound compound = stack.getTagCompound();
-        if (compound != null && compound.hasKey("EntityType") && !compound.getString("EntityType").equals("empty"))
-            return super.getItemStackDisplayName(stack) + " (" + EnumChatFormatting.DARK_PURPLE + compound.getString("EntityType") + EnumChatFormatting.RESET + ")";
+        if (Utils.hasTagCompound(stack) && !Utils.getDisplayName(stack).equals("null")) {
+            return super.getItemStackDisplayName(stack) + " (" + EnumChatFormatting.YELLOW + Utils.getDisplayName(stack) + EnumChatFormatting.RESET + ")";
+        }
+
         return super.getItemStackDisplayName(stack);
     }
 
@@ -51,12 +49,7 @@ public class SoulShardItem extends Item {
         for (EnumType type : EnumType.META_LOOKUP) {
             ItemStack stack = new ItemStack(itemIn, 1, type.getDamage());
             if (!stack.hasTagCompound()) {
-                //TODO: USE TierHelper.class
-                NBTTagCompound compound = new NBTTagCompound();
-                compound.setString("EntityType", "empty");
-                compound.setInteger("Tier", type.getTier());
-                compound.setInteger("KillCount", 0);
-                stack.setTagCompound(compound);
+                Utils.initShard(stack);
                 subItems.add(stack);
             }
         }
@@ -68,69 +61,27 @@ public class SoulShardItem extends Item {
         return stack.getItemDamage() == 6;
     }
 
-    public static void boundEntity(EntityLiving entityLiving, ItemStack stack) {
-        if (!isSoulShard(stack))
-            return;
-
-        if (isBound(stack))
-            return;
-
-        if (SoulShard.mobMapping.isMobBlackListed(entityLiving))
-            return;
-
-        NBTTagCompound compound = new NBTTagCompound();
-
-        if (stack.getItemDamage() == EnumType.UNBOUND.getDamage()) {
-            stack.setTagCompound(new NBTTagCompound());
-            stack.getTagCompound().setInteger("KillCount", 0);
-            stack.getTagCompound().setString("EntityType", "empty");
-            stack.getTagCompound().setInteger("Tier", 0);
-            stack.setItemDamage(1);
-        }
-
-        if (stack.getItemDamage() != EnumType.UNBOUND.getDamage()) {
-
-            entityLiving.writeEntityToNBT(compound);
-
-            stack.getTagCompound().setTag("EntitySaved", compound);
-            stack.getTagCompound().setString("EntityType", SoulShard.mobMapping.getEntityType(entityLiving));
-        }
-    }
-
     public static void increaseShardKillCount(ItemStack stack, int kill) {
 
-        if (!stack.hasTagCompound())
+        if (!Utils.hasTagCompound(stack))
             return;
 
-        if (!stack.getTagCompound().hasKey("KillCount"))
+        if (!stack.getTagCompound().hasKey(Utils.KILL_COUNT))
             return;
 
-        stack.getTagCompound().setInteger("KillCount", stack.getTagCompound().getInteger("KillCount") + kill);
+        Utils.addKillCount(stack, kill);
 
-        TierHelper.checkShard(stack);
-    }
-
-    public static String getEntityTypeFromStack(ItemStack stack) {
-        if (stack.hasTagCompound() && stack.getTagCompound().hasKey("EntityType") && !stack.getTagCompound().getString("EntityType").equals("empty")) {
-            return stack.getTagCompound().getString("EntityType");
-        }
-
-        return "empty";
-    }
-
-    public static boolean isBound(ItemStack stack) {
-        return stack.hasTagCompound() && stack.getTagCompound().hasKey("EntityType") && !stack.getTagCompound().getString("EntityType").equals("empty");
+        Utils.checkAndFixShard(stack);
     }
 
     public static ItemStack getShardFromInventory(EntityPlayer player, String entity) {
         ItemStack lastResort = null;
         for (int i = 0; i <= 8; i++) {
             ItemStack stack = player.inventory.getStackInSlot(i);
-
-            if (stack != null && stack.getItem() instanceof SoulShardItem && stack.getTagCompound().getInteger("KillCount") <= TierHelper.MAX_MOB_KILL) {
-                if (!isBound(stack) && lastResort == null) {
+            if (stack != null && stack.getItem() instanceof SoulShardItem && Utils.getTierForStack(stack) <= 5) {
+                if (!Utils.isBound(stack) && lastResort == null) {
                     lastResort = stack;
-                } else if (getEntityTypeFromStack(stack).equals(entity)){
+                } else if (Utils.getEntityType(stack).equals(entity)){
                     return stack;
                 }
             }
@@ -139,11 +90,7 @@ public class SoulShardItem extends Item {
         return lastResort;
     }
 
-    public static boolean isSoulShard(ItemStack stack) {
-        return stack.getItem() instanceof SoulShardItem;
-    }
-
-    public static enum EnumType implements IStringSerializable {
+    public enum EnumType implements IStringSerializable {
 
         UNBOUND(-1, 0, "unbound"),
         TIER_0(0, 1, "tier0"),
@@ -170,6 +117,7 @@ public class SoulShardItem extends Item {
         private EnumType(int tier, int damage, String name) {
             this.damage = damage;
             this.name = name;
+            this.tier = tier;
         }
 
         public int getTier() {
@@ -196,6 +144,10 @@ public class SoulShardItem extends Item {
             }
 
             return META_LOOKUP[meta];
+        }
+
+        public static EnumType[] getMetaLookup() {
+            return META_LOOKUP;
         }
     }
 

@@ -1,5 +1,6 @@
 package fr.bretzel.soulshard.event;
 
+import fr.bretzel.soulshard.Utils;
 import fr.bretzel.soulshard.item.SoulShardItem;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.EnumChatFormatting;
@@ -16,8 +17,8 @@ public class ToolTipEvent {
     public void onToolTipEvent(ItemTooltipEvent event) {
         if (event.itemStack.getItem() instanceof SoulShardItem && event.itemStack.hasTagCompound() && event.itemStack.getItemDamage() != SoulShardItem.EnumType.UNBOUND.getDamage()) {
             if (GuiScreen.isShiftKeyDown()) {
-                event.toolTip.add(TIER + ": " + event.itemStack.getTagCompound().getInteger("Tier"));
-                event.toolTip.add(KILL + ": " + event.itemStack.getTagCompound().getInteger("KillCount"));
+                event.toolTip.add(TIER + ": " + Utils.getTierForStack(event.itemStack));
+                event.toolTip.add(KILL + ": " + Utils.getKillCount(event.itemStack));
             } else {
                 event.toolTip.add(EnumChatFormatting.GOLD + "<HOLD SHIFT>");
             }
