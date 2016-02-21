@@ -1,9 +1,9 @@
 {
     "__comment": "Model generated using MrCrayfish's Model Creator (http://mrcrayfish.com/modelcreator/)",
-    "ambientocclusion": false,
+"ambientocclusion": false,
     "textures": {
-        "particle": "soulshard:blocks/soulcage_unbound",
-        "0": "soulshard:blocks/soulcage_unbound",
+        "particle": "soulshard:blocks/soulcage_active",
+        "0": "soulshard:blocks/soulcage_active",
         "1": "blocks/obsidian"
     },
     "elements": [
@@ -265,6 +265,19 @@
                 "west": { "texture": "#0", "uv": [ 3.0, 0.0, 13.0, 3.0 ] },
                 "up": { "texture": "#0", "uv": [ 0.0, 3.0, 3.0, 13.0 ] },
                 "down": { "texture": "#0", "uv": [ 0.0, 3.0, 3.0, 13.0 ] }
+            }
+        },
+        {
+            "name": "Cube",
+            "from": [ 4.0, 4.0, 4.0 ], 
+            "to": [ 12.0, 12.0, 12.0 ], 
+            "faces": {
+                "north": { "texture": "#0", "uv": [ 4.0, 4.0, 12.0, 12.0 ] },
+                "east": { "texture": "#0", "uv": [ 4.0, 4.0, 12.0, 12.0 ] },
+                "south": { "texture": "#0", "uv": [ 4.0, 4.0, 12.0, 12.0 ] },
+                "west": { "texture": "#0", "uv": [ 4.0, 4.0, 12.0, 12.0 ] },
+                "up": { "texture": "#0", "uv": [ 4.0, 4.0, 12.0, 12.0 ] },
+                "down": { "texture": "#0", "uv": [ 4.0, 4.0, 12.0, 12.0 ] }
             }
         }
     ]

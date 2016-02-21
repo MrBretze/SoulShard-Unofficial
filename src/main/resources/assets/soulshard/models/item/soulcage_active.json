@@ -1,5 +1,5 @@
 {
-  "parent": "soulshard:block/inactive_soulcage",
+  "parent": "soulshard:block/soulcage_active",
   "display": {
     "thirdperson": {
       "rotation": [ 10, -45, 170 ],

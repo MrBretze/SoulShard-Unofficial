@@ -8,8 +8,8 @@ public class RenderRegistry {
 
     public static void registerRender() {
         addBlockRender(BlockRegistry.soulCage, 0, Reference.MODID + ":soulcage_unbound", "inventory");
-        addBlockRender(BlockRegistry.soulCage, 1, Reference.MODID + ":inactive_soulcage", "inventory");
-        addBlockRender(BlockRegistry.soulCage, 2, Reference.MODID + ":active_soulcage", "inventory");
+        addBlockRender(BlockRegistry.soulCage, 1, Reference.MODID + ":soulcage_inactive", "inventory");
+        addBlockRender(BlockRegistry.soulCage, 2, Reference.MODID + ":soulcage_active", "inventory");
 
         addItemRender(ItemRegistry.soulShard, 0, Reference.MODID + ":unbound_soulshard", "inventory");
         addItemRender(ItemRegistry.soulShard, 1, Reference.MODID + ":tier0_soulshard", "inventory");

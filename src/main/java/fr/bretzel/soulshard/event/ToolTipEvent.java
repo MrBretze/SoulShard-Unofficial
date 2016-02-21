@@ -15,7 +15,7 @@ public class ToolTipEvent {
 
     @SubscribeEvent
     public void onToolTipEvent(ItemTooltipEvent event) {
-        if (event.itemStack.getItem() instanceof SoulShardItem && event.itemStack.hasTagCompound() && event.itemStack.getItemDamage() != SoulShardItem.EnumType.UNBOUND.getDamage()) {
+        if (Utils.isBound(event.itemStack) && Utils.hasTagCompound(event.itemStack) && event.itemStack.getItemDamage() != SoulShardItem.EnumType.UNBOUND.getDamage()) {
             if (GuiScreen.isShiftKeyDown()) {
                 event.toolTip.add(TIER + ": " + Utils.getTierForStack(event.itemStack));
                 event.toolTip.add(KILL + ": " + Utils.getKillCount(event.itemStack));

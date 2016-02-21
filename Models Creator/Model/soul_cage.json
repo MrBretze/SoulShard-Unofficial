@@ -1,9 +1,8 @@
 {
     "__comment": "Model generated using MrCrayfish's Model Creator (http://mrcrayfish.com/modelcreator/)",
-    "ambientocclusion": false,
+"ambientocclusion": false,
     "textures": {
-        "particle": "soulshard:blocks/soulcage_unbound",
-        "0": "soulshard:blocks/soulcage_unbound",
+        "0": "blocks/soulCage",
         "1": "blocks/obsidian"
     },
     "elements": [

@@ -33,7 +33,7 @@ public class SoulShardConfig extends IConfig {
         requireOwnerOnline = getConfiguration().getBoolean("OwnerIsOnline", "General", false, "Soul Cage if owner is online to work");
         
         if (getConfiguration().hasChanged())
-				config.save();
+            getConfiguration().save();
     }
 
 }

@@ -7,6 +7,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.world.World;
@@ -27,17 +29,24 @@ public class SoulCageTileEntity extends TileEntity implements IInventory {
     }
 
     @Override
-    public void writeToNBT(NBTTagCompound p_writeToNBT_1_) {
-        super.writeToNBT(p_writeToNBT_1_);
+    public void writeToNBT(NBTTagCompound compound) {
+        super.writeToNBT(compound);
 
 
     }
 
     @Override
-    public void readFromNBT(NBTTagCompound p_readFromNBT_1_) {
-        super.readFromNBT(p_readFromNBT_1_);
+    public void readFromNBT(NBTTagCompound compound) {
+        super.readFromNBT(compound);
 
 
+    }
+
+    @Override
+    public Packet getDescriptionPacket() {
+        NBTTagCompound tagCompound = new NBTTagCompound();
+        writeToNBT(tagCompound);
+        return new S35PacketUpdateTileEntity(getPos(), 1, tagCompound);
     }
 
     @Override
@@ -54,8 +63,7 @@ public class SoulCageTileEntity extends TileEntity implements IInventory {
     public ItemStack decrStackSize(int i, int j) {
         if (j == 0) return null;
 
-        //ItemStack stack = new ItemStack(ItemRegistry.soulShard, 1, soul_shard.getItemDamage());
-        ItemStack stack = new ItemStack(ItemRegistry.soulShard, 0x1);
+        ItemStack stack = new ItemStack(ItemRegistry.soulShard, 1);
         stack.setTagCompound(soul_shard.getTagCompound());
         setInventorySlotContents(i, null);
         return stack;
@@ -132,6 +140,4 @@ public class SoulCageTileEntity extends TileEntity implements IInventory {
     public IChatComponent getDisplayName() {
         return null;
     }
-
-
 }

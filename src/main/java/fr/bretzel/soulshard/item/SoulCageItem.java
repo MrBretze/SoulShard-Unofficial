@@ -1,13 +1,15 @@
-package fr.bretzel.soulshard.itemblock;
+package fr.bretzel.soulshard.item;
 
+import fr.bretzel.soulshard.Utils;
 import fr.bretzel.soulshard.block.meta.IMetaBlockName;
 import net.minecraft.block.Block;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumChatFormatting;
 
-public class SoulCageItemBlockMeta extends ItemBlock {
+public class SoulCageItem extends ItemBlock {
 
-    public SoulCageItemBlockMeta(Block block) {
+    public SoulCageItem(Block block) {
         super(block);
         if (!(block instanceof IMetaBlockName)) {
             throw new IllegalArgumentException(String.format("The given Block %s is not an instance of ISpecialBlockName!", block.getUnlocalizedName()));
@@ -27,8 +29,11 @@ public class SoulCageItemBlockMeta extends ItemBlock {
     }
 
     @Override
-    public String getItemStackDisplayName(ItemStack p_getItemStackDisplayName_1_) {
-        //TODO: Display Entity name
-        return super.getItemStackDisplayName(p_getItemStackDisplayName_1_);
+    public String getItemStackDisplayName(ItemStack stack) {
+        if (Utils.hasTagCompound(stack) && !Utils.getDisplayName(stack).equals("null")) {
+            return super.getItemStackDisplayName(stack) + " (" + EnumChatFormatting.YELLOW + Utils.getDisplayName(stack) + EnumChatFormatting.RESET + ")";
+        }
+
+        return super.getItemStackDisplayName(stack);
     }
 }

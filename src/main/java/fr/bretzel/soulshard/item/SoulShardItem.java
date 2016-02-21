@@ -2,12 +2,18 @@ package fr.bretzel.soulshard.item;
 
 import fr.bretzel.soulshard.registry.CommonRegistry;
 import fr.bretzel.soulshard.Utils;
+import fr.bretzel.soulshard.tileentity.SoulCageTileEntity;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IStringSerializable;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -22,6 +28,50 @@ public class SoulShardItem extends Item {
         this.setMaxStackSize(1);
         this.setCreativeTab(CommonRegistry.creativeTab);
         this.setHasSubtypes(true);
+    }
+
+    @Override
+    public void onUpdate(ItemStack stack, World world, Entity entity, int slot, boolean isHeld) {
+        if (world.isRemote)
+            return;
+
+        if (!Utils.hasTagCompound(stack)) {
+            Utils.initShard(stack);
+        }
+
+        if (Utils.isBound(stack))
+            Utils.checkAndFixShard(stack);
+    }
+
+    @Override
+    public ItemStack onItemRightClick(ItemStack stack, World world, EntityPlayer player) {
+        if (world.isRemote)
+            return stack;
+
+        if (!Utils.isBound(stack)) {
+            return stack;
+        }
+
+        MovingObjectPosition mop = getMovingObjectPositionFromPlayer(world, player, false);
+
+        if (mop == null || mop.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK)
+            return stack;
+
+        TileEntity tileEntity = world.getTileEntity(mop.getBlockPos());
+
+        if (tileEntity == null && !(tileEntity instanceof SoulCageTileEntity))
+            return stack;
+
+        SoulCageTileEntity soulTile = (SoulCageTileEntity) tileEntity;
+
+        if (Utils.isBound(soulTile)) {
+            world.spawnEntityInWorld(new EntityItem(world, soulTile.getPos().getX(), soulTile.getPos().getY(), soulTile.getPos().getZ(), soulTile.getStackInSlot(0)));
+            soulTile.setInventorySlotContents(0, null);
+        }
+
+
+
+        return stack;
     }
 
     @Override

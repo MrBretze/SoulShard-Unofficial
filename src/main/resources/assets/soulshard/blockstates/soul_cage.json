@@ -1,7 +1,7 @@
 {
   "variants": {
     "type=unbound_soulcage": {"model": "soulshard:soulcage_unbound"},
-    "type=inactive_soulcage": {"model": "soulshard:inactive_soulcage"},
-    "type=active_soulcage": {"model": "soulshard:active_soulcage"}
+    "type=inactive_soulcage": {"model": "soulshard:soulcage_inactive"},
+    "type=active_soulcage": {"model": "soulshard:soulcage_active"}
   }
 }
