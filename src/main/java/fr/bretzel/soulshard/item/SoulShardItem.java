@@ -65,6 +65,9 @@ public class SoulShardItem extends Item {
             ItemStack stack = new ItemStack(itemIn, 1, type.getDamage());
             if (!stack.hasTagCompound()) {
                 Utils.initShard(stack);
+                if (type.getTier() >= 0)
+                    Utils.setKillCount(stack, Utils.getMaxKillForTier(type.getTier()));
+
                 subItems.add(stack);
             }
         }

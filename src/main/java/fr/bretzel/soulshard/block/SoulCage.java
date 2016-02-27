@@ -142,6 +142,7 @@ public class SoulCage extends Block implements IMetaBlockName {
                 player.addChatComponentMessage(new ChatComponentText("KillCount: " + Utils.getKillCount(soulTile.soul_shard)));
                 player.addChatComponentMessage(new ChatComponentText("Need Redstone: " + Utils.needRedstone(Utils.getTier(soulTile.soul_shard))));
                 player.addChatComponentMessage(new ChatComponentText("Spawner delay: " + Utils.getTime(Utils.getTier(soulTile.soul_shard))));
+                player.addChatComponentMessage(new ChatComponentText("Entity type: " + Utils.getEntityType(soulTile.soul_shard)));
             }
         }
         return false;
