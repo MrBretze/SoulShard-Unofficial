@@ -1,5 +1,6 @@
 package fr.bretzel.soulshard.item;
 
+import fr.bretzel.soulshard.FileUtils;
 import fr.bretzel.soulshard.SoulShard;
 import fr.bretzel.soulshard.registry.CommonRegistry;
 import fr.bretzel.soulshard.Utils;
@@ -53,26 +54,20 @@ public class SoulShardItem extends Item {
             return stack;
         }
 
-        MovingObjectPosition mop = getMovingObjectPositionFromPlayer(world, player, false);
+        MovingObjectPosition mop = FileUtils.getMovingObjectPositionFromPlayer(world, player, false);
 
         if (mop == null || mop.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK)
             return stack;
 
         TileEntity tileEntity = world.getTileEntity(mop.getBlockPos());
 
-        SoulShard.soulLog.info("TileEntity: " + tileEntity);
-        SoulShard.soulLog.info("Block: " + world.getBlockState(mop.getBlockPos()).getBlock().getLocalizedName());
-
         if (tileEntity == null && !(tileEntity instanceof SoulCageTileEntity))
             return stack;
 
-        SoulShard.soulLog.info("TEEEEEEEEEEEEST");
-
         SoulCageTileEntity soulTile = (SoulCageTileEntity) tileEntity;
 
-        if (Utils.isBound(soulTile)) {
-            world.spawnEntityInWorld(new EntityItem(world, soulTile.getPos().getX(), soulTile.getPos().getY(), soulTile.getPos().getZ(), soulTile.getStackInSlot(0)));
-            soulTile.setInventorySlotContents(0, null);
+        if (Utils.isBound(soulTile) && soulTile.soul_shard != null) {
+           return stack;
         }
 
         soulTile.setInventorySlotContents(0, stack);

@@ -114,7 +114,7 @@ public class SoulCageTileEntity extends TileEntity implements IInventory {
     public boolean isItemValidForSlot(int i, ItemStack stack) {
         if (stack.getItem() != ItemRegistry.soulShard || !stack.hasTagCompound()) return false;
         NBTTagCompound nbt = stack.getTagCompound();
-        return (soul_shard == null && nbt.getInteger("Tier") > 0 && !nbt.getString("EntityType").equals("empty"));
+        return (soul_shard == null && nbt.getInteger("Tier") > 0 && !nbt.getString("EntityType").equals("null"));
     }
 
     @Override

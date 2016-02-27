@@ -4,15 +4,19 @@ import fr.bretzel.soulshard.SoulShard;
 import fr.bretzel.soulshard.Utils;
 import fr.bretzel.soulshard.item.SoulShardItem;
 import fr.bretzel.soulshard.registry.ItemRegistry;
+import fr.bretzel.soulshard.tileentity.SoulCageTileEntity;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-public class KillEvent {
+public class CommonEvent {
 
     @SubscribeEvent
     public void onEntityKill(LivingDeathEvent event) {
@@ -49,5 +53,4 @@ public class KillEvent {
             SoulShardItem.increaseShardKillCount(shardItem, soulStealer + 1);
         }
     }
-
 }

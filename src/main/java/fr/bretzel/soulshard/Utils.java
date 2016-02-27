@@ -145,6 +145,6 @@ public class Utils {
     }
 
     public static boolean isBound(SoulCageTileEntity tileEntity) {
-        return isBound(tileEntity.getStackInSlot(0)) && tileEntity.getStackInSlot(0) != null;
+        return tileEntity.getStackInSlot(0) != null && isBound(tileEntity.getStackInSlot(0));
     }
 }

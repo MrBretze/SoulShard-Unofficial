@@ -1,6 +1,7 @@
 package fr.bretzel.soulshard.block;
 
 
+import fr.bretzel.soulshard.Utils;
 import fr.bretzel.soulshard.block.meta.IMetaBlockName;
 import fr.bretzel.soulshard.registry.CommonRegistry;
 import fr.bretzel.soulshard.registry.ItemRegistry;
@@ -90,6 +91,11 @@ public class SoulCage extends Block implements IMetaBlockName {
     }
 
     @Override
+    public boolean hasTileEntity(IBlockState state) {
+        return true;
+    }
+
+    @Override
     public TileEntity createTileEntity(World world, IBlockState state) {
         return new SoulCageTileEntity();
     }
@@ -102,17 +108,16 @@ public class SoulCage extends Block implements IMetaBlockName {
 
             if (tile != null) {
 
-                if (player.getHeldItem() != null && player.getHeldItem().getItem() == ItemRegistry.soulShard) {
+                if (player.getHeldItem() != null && player.getHeldItem().getItem() == ItemRegistry.soulShard && tile.soul_shard == null) {
 
                     ItemStack stack = player.getHeldItem();
 
-                    if (stack.hasTagCompound()) {
+                    if (Utils.hasTagCompound(stack) && Utils.isBound(stack)) {
 
-                        NBTTagCompound compound = stack.getTagCompound();
-                        int tier = compound.getInteger("Tier");
-                        String entName = compound.getString("EntityType");
+                        int tier = Utils.getTier(stack);
+                        String entName = Utils.getEntityType(stack);
 
-                        if (tier == 0 || entName.isEmpty() || entName.equals("empty"))
+                        if (tier == 0 || entName.isEmpty() || entName.equals("null"))
                             return false;
 
                         tile.setInventorySlotContents(0, stack);
@@ -127,6 +132,7 @@ public class SoulCage extends Block implements IMetaBlockName {
                     if (tile.soul_shard != null) {
                         Entity entity = new EntityItem(world, blockPos.getX(), blockPos.getY(), blockPos.getZ(), tile.soul_shard);
                         world.spawnEntityInWorld(entity);
+                        tile.setInventorySlotContents(0, null);
                     }
                 }
             }
@@ -134,7 +140,7 @@ public class SoulCage extends Block implements IMetaBlockName {
         return false;
     }
 
-    public static enum EnumType implements IStringSerializable {
+    public enum EnumType implements IStringSerializable {
 
         UNBOUND_SOULCAGE(0, "unbound_soulcage"),
         INACTIVE_SOULCAGE(1, "inactive_soulcage"),

@@ -10,6 +10,8 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
 
 import java.io.File;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -107,12 +109,15 @@ public class MobMapping {
         }
 
         entityList.add("Wither Skeleton");
+
+        NumberFormat format = new DecimalFormat("##");
+
         SoulShard.soulLog.info("===================================================");
         SoulShard.soulLog.info("=================== SOUL SHARD ====================");
         SoulShard.soulLog.info("===================================================");
         SoulShard.soulLog.info("============== TOTAL ENTITY MAPPED: " + entityList.size() + " ============");
         SoulShard.soulLog.info("===================================================");
-        SoulShard.soulLog.info("============= BLACKLISTED ENTITY: " + blackList.size() + " =================");
+        SoulShard.soulLog.info("============ BLACKLISTED ENTITY: " + format.format(blackList.size()) + " ===============");
         SoulShard.soulLog.info("===================================================");
     }
 
