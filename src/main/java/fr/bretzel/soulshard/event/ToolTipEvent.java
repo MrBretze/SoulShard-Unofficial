@@ -16,12 +16,8 @@ public class ToolTipEvent {
     @SubscribeEvent
     public void onToolTipEvent(ItemTooltipEvent event) {
         if (Utils.isBound(event.itemStack) && Utils.hasTagCompound(event.itemStack) && event.itemStack.getItemDamage() != SoulShardItem.EnumType.UNBOUND.getDamage()) {
-            if (GuiScreen.isShiftKeyDown()) {
-                event.toolTip.add(TIER + ": " + Utils.getTierForStack(event.itemStack));
-                event.toolTip.add(KILL + ": " + Utils.getKillCount(event.itemStack));
-            } else {
-                event.toolTip.add(EnumChatFormatting.GOLD + "<HOLD SHIFT>");
-            }
+            event.toolTip.add(TIER + ": " + Utils.getTier(event.itemStack));
+            event.toolTip.add(KILL + ": " + Utils.getKillCount(event.itemStack));
         }
     }
 

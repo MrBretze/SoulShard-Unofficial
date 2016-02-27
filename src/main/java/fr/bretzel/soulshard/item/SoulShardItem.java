@@ -1,5 +1,6 @@
 package fr.bretzel.soulshard.item;
 
+import fr.bretzel.soulshard.SoulShard;
 import fr.bretzel.soulshard.registry.CommonRegistry;
 import fr.bretzel.soulshard.Utils;
 import fr.bretzel.soulshard.tileentity.SoulCageTileEntity;
@@ -45,7 +46,7 @@ public class SoulShardItem extends Item {
 
     @Override
     public ItemStack onItemRightClick(ItemStack stack, World world, EntityPlayer player) {
-        if (world.isRemote)
+        if (!world.isRemote)
             return stack;
 
         if (!Utils.isBound(stack)) {
@@ -59,8 +60,13 @@ public class SoulShardItem extends Item {
 
         TileEntity tileEntity = world.getTileEntity(mop.getBlockPos());
 
+        SoulShard.soulLog.info("TileEntity: " + tileEntity);
+        SoulShard.soulLog.info("Block: " + world.getBlockState(mop.getBlockPos()).getBlock().getLocalizedName());
+
         if (tileEntity == null && !(tileEntity instanceof SoulCageTileEntity))
             return stack;
+
+        SoulShard.soulLog.info("TEEEEEEEEEEEEST");
 
         SoulCageTileEntity soulTile = (SoulCageTileEntity) tileEntity;
 
@@ -69,7 +75,7 @@ public class SoulShardItem extends Item {
             soulTile.setInventorySlotContents(0, null);
         }
 
-
+        soulTile.setInventorySlotContents(0, stack);
 
         return stack;
     }
@@ -128,7 +134,7 @@ public class SoulShardItem extends Item {
         ItemStack lastResort = null;
         for (int i = 0; i <= 8; i++) {
             ItemStack stack = player.inventory.getStackInSlot(i);
-            if (stack != null && stack.getItem() instanceof SoulShardItem && Utils.getTierForStack(stack) <= 5) {
+            if (stack != null && stack.getItem() instanceof SoulShardItem && Utils.getTier(stack) <= 5) {
                 if (!Utils.isBound(stack) && lastResort == null) {
                     lastResort = stack;
                 } else if (Utils.getEntityType(stack).equals(entity)){

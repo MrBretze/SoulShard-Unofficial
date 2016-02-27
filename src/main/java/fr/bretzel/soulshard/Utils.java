@@ -15,6 +15,7 @@ public class Utils {
     public static final String DISPLAY_NAME = "DisplayName";
 
     private static final int[] KILL_MOB = {64, 128, 256, 512, 1024};
+    private static final boolean[] NEED_REDSTONE = {false, false, false, true, true};
 
     public static void checkAndFixShard(ItemStack stack) {
 
@@ -52,13 +53,7 @@ public class Utils {
     }
 
     public static void boundEntity(EntityLiving entityLiving, ItemStack stack) {
-        if (!isSoulShard(stack))
-            return;
-
-        if (isBound(stack))
-            return;
-
-        if (SoulShard.mobMapping.isMobBlackListed(entityLiving))
+        if (!isSoulShard(stack) || isBound(stack) || SoulShard.mobMapping.isMobBlackListed(entityLiving))
             return;
 
         NBTTagCompound compound = new NBTTagCompound();
@@ -97,13 +92,6 @@ public class Utils {
         return stack.getTagCompound().getString(ENTITY_TYPE);
     }
 
-    public static int getTierForStack(ItemStack stack) {
-        if (!hasTagCompound(stack))
-            return 0;
-
-        return getTier(stack);
-    }
-
     public static int getDamageForTier(int tier) {
         for (SoulShardItem.EnumType type : SoulShardItem.EnumType.getMetaLookup()) {
             if (type.getTier() == tier)
@@ -127,6 +115,9 @@ public class Utils {
     }
 
     public static void setKillCount(ItemStack stack, int i) {
+        if (!hasTagCompound(stack))
+            return;
+
         stack.getTagCompound().setInteger(KILL_COUNT, i);
     }
 
@@ -154,13 +145,6 @@ public class Utils {
     }
 
     public static boolean isBound(SoulCageTileEntity tileEntity) {
-        return tileEntity.getTileData().hasKey(ENTITY_TYPE) && !tileEntity.getTileData().getString(ENTITY_TYPE).equals("null");
-    }
-
-    public static void boundEntity(SoulCageTileEntity tileEntity) {
-
-        //TODO: Init this !
-
-        //tileEntity.
+        return isBound(tileEntity.getStackInSlot(0)) && tileEntity.getStackInSlot(0) != null;
     }
 }

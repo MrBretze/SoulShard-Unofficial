@@ -1,8 +1,6 @@
 package fr.bretzel.soulshard.tileentity;
 
-import fr.bretzel.soulshard.block.SoulCage;
 import fr.bretzel.soulshard.registry.ItemRegistry;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -11,35 +9,42 @@ import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IChatComponent;
-import net.minecraft.world.World;
 
 import java.util.UUID;
 
 public class SoulCageTileEntity extends TileEntity implements IInventory {
 
-    public SoulCage soulCage;
-    public IBlockState blockState;
     public ItemStack soul_shard;
     public UUID owner;
-
-    public SoulCageTileEntity(World world, SoulCage soulCage, IBlockState state) {
-        this.blockState = state;
-        this.soulCage = soulCage;
-        setWorldObj(world);
-    }
+    public boolean isActive = false;
+    public boolean hasShard = false;
 
     @Override
     public void writeToNBT(NBTTagCompound compound) {
         super.writeToNBT(compound);
 
+        compound.setBoolean("Active", isActive);
 
+        if (soul_shard != null) {
+            NBTTagCompound ntcp = new NBTTagCompound();
+            soul_shard.writeToNBT(ntcp);
+            compound.setTag("SoulShard", ntcp);
+        }
     }
 
     @Override
     public void readFromNBT(NBTTagCompound compound) {
         super.readFromNBT(compound);
 
+        isActive = compound.getBoolean("Active");
 
+        if (compound.hasKey("SoulShard")) {
+            soul_shard = ItemStack.loadItemStackFromNBT(compound.getCompoundTag("SoulShard"));
+
+            if (soul_shard != null)
+                hasShard = true;
+
+        }
     }
 
     @Override
@@ -77,6 +82,12 @@ public class SoulCageTileEntity extends TileEntity implements IInventory {
     @Override
     public void setInventorySlotContents(int i, ItemStack itemStack) {
         soul_shard = itemStack;
+
+        if (itemStack == null) {
+            hasShard = false;
+        } else {
+            hasShard = true;
+        }
     }
 
     @Override

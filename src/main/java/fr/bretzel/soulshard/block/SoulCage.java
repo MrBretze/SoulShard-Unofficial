@@ -91,7 +91,7 @@ public class SoulCage extends Block implements IMetaBlockName {
 
     @Override
     public TileEntity createTileEntity(World world, IBlockState state) {
-        return new SoulCageTileEntity(world, this, state);
+        return new SoulCageTileEntity();
     }
 
     @Override
