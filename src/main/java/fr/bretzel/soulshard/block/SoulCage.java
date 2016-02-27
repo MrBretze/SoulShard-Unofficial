@@ -3,8 +3,8 @@ package fr.bretzel.soulshard.block;
 
 import fr.bretzel.soulshard.Utils;
 import fr.bretzel.soulshard.block.meta.IMetaBlockName;
+import fr.bretzel.soulshard.item.SoulShardItem;
 import fr.bretzel.soulshard.registry.CommonRegistry;
-import fr.bretzel.soulshard.registry.ItemRegistry;
 import fr.bretzel.soulshard.tileentity.SoulCageTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -12,17 +12,12 @@ import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.*;
 import net.minecraft.world.World;
 
 import java.util.List;
@@ -104,37 +99,49 @@ public class SoulCage extends Block implements IMetaBlockName {
     public boolean onBlockActivated(World world, BlockPos blockPos, IBlockState state, EntityPlayer player, EnumFacing facing, float par7, float par8, float par9) {
         if (!world.isRemote) {
 
-            SoulCageTileEntity tile = (SoulCageTileEntity) world.getTileEntity(blockPos);
+            TileEntity tile = world.getTileEntity(blockPos);
 
-            if (tile != null) {
+            if (tile == null || !(tile instanceof SoulCageTileEntity))
+                return false;
 
-                if (player.getHeldItem() != null && player.getHeldItem().getItem() == ItemRegistry.soulShard && tile.soul_shard == null) {
+            SoulCageTileEntity soulTile = (SoulCageTileEntity) tile;
 
-                    ItemStack stack = player.getHeldItem();
-
-                    if (Utils.hasTagCompound(stack) && Utils.isBound(stack)) {
-
-                        int tier = Utils.getTier(stack);
-                        String entName = Utils.getEntityType(stack);
-
-                        if (tier == 0 || entName.isEmpty() || entName.equals("null"))
-                            return false;
-
-                        tile.setInventorySlotContents(0, stack);
-                        tile.owner = player.getUniqueID();
-
-                        if(!player.capabilities.isCreativeMode)
-                            stack.stackSize--;
-                    }
+            if (player.getHeldItem() == null && player.isSneaking()) {
+                if (soulTile.soul_shard != null) {
+                    world.spawnEntityInWorld(new EntityItem(world, blockPos.getX() + 0.5, blockPos.getY() + 0.6, blockPos.getZ() + 0.5, soulTile.getSoulShardStack()));
+                    soulTile.soul_shard = null;
                 }
 
-                if (player.isSneaking() && player.getHeldItem() == null) {
-                    if (tile.soul_shard != null) {
-                        Entity entity = new EntityItem(world, blockPos.getX(), blockPos.getY(), blockPos.getZ(), tile.soul_shard);
-                        world.spawnEntityInWorld(entity);
-                        tile.setInventorySlotContents(0, null);
-                    }
+                return true;
+            }
+
+            if (player.getHeldItem() != null && player.getHeldItem().getItem() instanceof SoulShardItem && soulTile.soul_shard == null) {
+
+                ItemStack soulStack = player.getHeldItem();
+
+                if (Utils.isBound(soulStack)) {
+
+                    int tier = Utils.getTier(soulStack);
+                    String entName = Utils.getEntityType(soulStack);
+
+                    if (tier == 0 || entName.isEmpty() || entName.equals("null"))
+                        return false;
+
+                    soulTile.soul_shard = soulStack;
+
+                    if (!player.capabilities.isCreativeMode)
+                        soulStack.stackSize--;
+
+                    return true;
                 }
+            }
+
+            if (player.getHeldItem() == null && soulTile.soul_shard != null) {
+                player.addChatComponentMessage(new ChatComponentText("Soul Cage Info"));
+                player.addChatComponentMessage(new ChatComponentText("Tier: " + Utils.getTier(soulTile.soul_shard)));
+                player.addChatComponentMessage(new ChatComponentText("KillCount: " + Utils.getKillCount(soulTile.soul_shard)));
+                player.addChatComponentMessage(new ChatComponentText("Need Redstone: " + Utils.needRedstone(Utils.getTier(soulTile.soul_shard))));
+                player.addChatComponentMessage(new ChatComponentText("Spawner delay: " + Utils.getTime(Utils.getTier(soulTile.soul_shard))));
             }
         }
         return false;

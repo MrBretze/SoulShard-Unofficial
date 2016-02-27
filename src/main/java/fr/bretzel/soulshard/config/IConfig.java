@@ -1,6 +1,6 @@
 package fr.bretzel.soulshard.config;
 
-import fr.bretzel.soulshard.FileUtils;
+import fr.bretzel.soulshard.Utils;
 import net.minecraftforge.common.config.Configuration;
 
 import java.io.File;
@@ -13,7 +13,7 @@ public abstract class IConfig {
 
     public IConfig(File file) {
         if (!file.exists()) {
-            FileUtils.createNewFile(file);
+            Utils.createNewFile(file);
         }
 
         this.file = file;

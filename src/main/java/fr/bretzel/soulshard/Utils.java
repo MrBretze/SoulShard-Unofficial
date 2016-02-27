@@ -3,8 +3,17 @@ package fr.bretzel.soulshard;
 import fr.bretzel.soulshard.item.SoulShardItem;
 import fr.bretzel.soulshard.tileentity.SoulCageTileEntity;
 import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.MathHelper;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.Vec3;
+import net.minecraft.world.World;
+
+import java.io.File;
+import java.io.IOException;
 
 public class Utils {
 
@@ -15,11 +24,12 @@ public class Utils {
     public static final String DISPLAY_NAME = "DisplayName";
 
     private static final int[] KILL_MOB = {64, 128, 256, 512, 1024};
-    private static final boolean[] NEED_REDSTONE = {false, false, false, true, true};
+    private static final int[] TIME = {13, 10, 7, 5, 3};
+    private static final boolean[] NEED_REDSTONE = {false, false, true, true, true};
 
     public static void checkAndFixShard(ItemStack stack) {
 
-        if (!(stack.getItem() instanceof SoulShardItem)) {
+        if (!isSoulShard(stack)) {
             throw new IllegalArgumentException("Only use a SoulShard item for this method !");
         }
 
@@ -34,11 +44,22 @@ public class Utils {
 
         int tier = getTier(stack);
 
-        if (getKillCount(stack) >= getMaxKillForTier(tier) && tier <= 5)
-            setTier(stack, tier + 1);
+        if (getKillCount(stack) >= getMaxKillForTier(tier) && tier <= 5) {
+
+            tier++;
+
+            if (tier > 5)
+                tier = 5;
+
+            setTier(stack, tier);
+        }
+
+        if (getKillCount(stack) > getMaxKillForTier(5))
+            setKillCount(stack, getMaxKillForTier(5));
 
         if (stack.getItemDamage() != getDamageForTier(getTier(stack)))
             stack.setItemDamage(getDamageForTier(getTier(stack)));
+
     }
 
     public static void initShard(ItemStack stack) {
@@ -82,7 +103,24 @@ public class Utils {
     }
 
     public static int getMaxKillForTier(int tier) {
+        if (tier == 5)
+            tier = 4;
+
         return KILL_MOB[tier];
+    }
+
+    public static int getTime(int tier) {
+        if (tier == 5)
+            tier = 4;
+
+        return TIME[tier];
+    }
+
+    public static boolean needRedstone(int tier) {
+        if (tier == 5)
+            tier = 4;
+
+        return NEED_REDSTONE[tier];
     }
 
     public static String getEntityType(ItemStack stack) {
@@ -145,6 +183,37 @@ public class Utils {
     }
 
     public static boolean isBound(SoulCageTileEntity tileEntity) {
-        return tileEntity.getStackInSlot(0) != null && isBound(tileEntity.getStackInSlot(0));
+        return tileEntity.soul_shard != null && isBound(tileEntity.soul_shard);
+    }
+
+    public static MovingObjectPosition getMovingObjectPositionFromPlayer(World world, EntityPlayer player, boolean bool) {
+        float f = player.rotationPitch;
+        float f1 = player.rotationYaw;
+        double d0 = player.posX;
+        double d1 = player.posY + (double)player.getEyeHeight();
+        double d2 = player.posZ;
+        Vec3 vec3 = new Vec3(d0, d1, d2);
+        float f2 = MathHelper.cos(-f1 * 0.017453292F - 3.1415927F);
+        float f3 = MathHelper.sin(-f1 * 0.017453292F - 3.1415927F);
+        float f4 = -MathHelper.cos(-f * 0.017453292F);
+        float f5 = MathHelper.sin(-f * 0.017453292F);
+        float f6 = f3 * f4;
+        float f7 = f2 * f4;
+        double d3 = 5.0D;
+
+        if(player instanceof EntityPlayerMP) {
+            d3 = ((EntityPlayerMP) player).theItemInWorldManager.getBlockReachDistance();
+        }
+
+        Vec3 vec31 = vec3.addVector((double)f6 * d3, (double)f5 * d3, (double)f7 * d3);
+        return world.rayTraceBlocks(vec3, vec31, bool, !bool, false);
+    }
+
+    public static void createNewFile(File file) {
+        try {
+            file.createNewFile();
+        } catch (IOException e) {
+            SoulShard.soulLog.warn(e.fillInStackTrace());
+        }
     }
 }
