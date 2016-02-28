@@ -164,7 +164,7 @@ public class Utils {
     }
 
     public static boolean hasTagCompound(ItemStack stack) {
-        return stack.hasTagCompound();
+        return stack != null && stack.hasTagCompound();
     }
 
     public static void setTier(ItemStack stack, int tier) {

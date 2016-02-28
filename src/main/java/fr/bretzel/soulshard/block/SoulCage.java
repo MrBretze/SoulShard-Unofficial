@@ -1,6 +1,7 @@
 package fr.bretzel.soulshard.block;
 
 
+import fr.bretzel.soulshard.SoulShard;
 import fr.bretzel.soulshard.Utils;
 import fr.bretzel.soulshard.block.meta.IMetaBlockName;
 import fr.bretzel.soulshard.item.SoulShardItem;
@@ -37,6 +38,28 @@ public class SoulCage extends Block implements IMetaBlockName {
         this.setResistance(resistance);
         this.setCreativeTab(CommonRegistry.creativeTab);
         this.setDefaultState(this.blockState.getBaseState().withProperty(METADATA, EnumType.UNBOUND_SOULCAGE));
+    }
+
+    @Override
+    public void onNeighborBlockChange(World world, BlockPos blockPos, IBlockState state, Block block) {
+        EnumType type = (EnumType) state.getValue(METADATA);
+        int redstone = world.isBlockIndirectlyGettingPowered(blockPos);
+
+        if (world.getTileEntity(blockPos) == null && !(world.getTileEntity(blockPos) instanceof SoulCageTileEntity) && type == EnumType.UNBOUND_SOULCAGE)
+            return;
+
+        SoulCageTileEntity soulTile = (SoulCageTileEntity) world.getTileEntity(blockPos);
+
+        if (soulTile.soul_shard != null) {
+
+            boolean needRedstone = Utils.needRedstone(Utils.getTier(soulTile.soul_shard));
+
+            if (needRedstone && redstone >= 1) {
+                soulTile.isActive = true;
+            } else {
+                soulTile.isActive = false;
+            }
+        }
     }
 
     @Override
@@ -107,8 +130,13 @@ public class SoulCage extends Block implements IMetaBlockName {
             SoulCageTileEntity soulTile = (SoulCageTileEntity) tile;
 
             if (player.getHeldItem() == null && player.isSneaking()) {
+
                 if (soulTile.soul_shard != null) {
+
+                    SoulShard.soulLog.info("TEEEST");
+
                     world.spawnEntityInWorld(new EntityItem(world, blockPos.getX() + 0.5, blockPos.getY() + 0.6, blockPos.getZ() + 0.5, soulTile.getSoulShardStack()));
+                    world.setBlockState(blockPos, getStateFromMeta(EnumType.UNBOUND_SOULCAGE.getDamage()));
                     soulTile.soul_shard = null;
                 }
 
@@ -128,6 +156,8 @@ public class SoulCage extends Block implements IMetaBlockName {
                         return false;
 
                     soulTile.soul_shard = soulStack;
+
+                    world.setBlockState(blockPos, getStateFromMeta(EnumType.INACTIVE_SOULCAGE.getDamage()));
 
                     if (!player.capabilities.isCreativeMode)
                         soulStack.stackSize--;
