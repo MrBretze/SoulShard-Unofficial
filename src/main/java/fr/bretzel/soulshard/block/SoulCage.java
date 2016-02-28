@@ -1,6 +1,7 @@
 package fr.bretzel.soulshard.block;
 
 
+import fr.bretzel.soulshard.SoulShard;
 import fr.bretzel.soulshard.Utils;
 import fr.bretzel.soulshard.block.meta.IMetaBlockName;
 import fr.bretzel.soulshard.item.SoulShardItem;
@@ -21,6 +22,7 @@ import net.minecraft.util.*;
 import net.minecraft.world.World;
 
 import java.util.List;
+import java.util.Random;
 
 public class SoulCage extends Block implements IMetaBlockName {
 
@@ -42,22 +44,13 @@ public class SoulCage extends Block implements IMetaBlockName {
     @Override
     public void onNeighborBlockChange(World world, BlockPos blockPos, IBlockState state, Block block) {
         EnumType type = (EnumType) state.getValue(METADATA);
-        int redstone = world.isBlockIndirectlyGettingPowered(blockPos);
-
         if (world.getTileEntity(blockPos) == null && !(world.getTileEntity(blockPos) instanceof SoulCageTileEntity) && type == EnumType.UNBOUND_SOULCAGE)
             return;
 
         SoulCageTileEntity soulTile = (SoulCageTileEntity) world.getTileEntity(blockPos);
 
         if (soulTile.soul_shard != null) {
-
-            boolean needRedstone = Utils.needRedstone(Utils.getTier(soulTile.soul_shard));
-
-            if (needRedstone && redstone >= 1) {
-                soulTile.isActive = true;
-            } else {
-                soulTile.isActive = false;
-            }
+            soulTile.isActive = world.isBlockPowered(blockPos);
         }
     }
 

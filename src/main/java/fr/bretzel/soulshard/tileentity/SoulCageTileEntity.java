@@ -15,12 +15,10 @@ import net.minecraft.util.ITickable;
 import net.minecraft.world.World;
 
 import java.util.Random;
-import java.util.UUID;
 
 public class SoulCageTileEntity extends TileEntity implements ITickable {
 
     public ItemStack soul_shard;
-    public UUID owner;
     public boolean isActive = false;
     public int tick = 20;
     public int spawnDelay = Integer.MAX_VALUE;
@@ -56,23 +54,27 @@ public class SoulCageTileEntity extends TileEntity implements ITickable {
 
         int tier = Utils.getTier(soul_shard);
 
-        if (spawnDelay == 0) {
+        if (spawnDelay <= 0) {
+
             spawnDelay = Utils.getTime(tier);
+            int b = Utils.getEntitySpawnForTier(tier);
 
-            Entity entity = EntityList.createEntityByName(Utils.getEntityType(soul_shard), worldObj);
+            for (int i = b; i >= 0; i--) {
 
-            if (entity == null) {
-                return;
-            }
+                Entity entity = EntityList.createEntityByName(Utils.getEntityType(soul_shard), worldObj);
 
-            if (entity instanceof EntityLiving) {
-                int b = Utils.getEntitySpawnForTier(tier);
-                for (int i = b; i >= 0; i--) {
+                if (entity == null) {
+                    return;
+                }
+
+                if (entity instanceof EntityLiving) {
                     EntityLiving entityLiving = (EntityLiving) entity;
                     BlockPos p = getRandomBlockPos(4);
                     entityLiving.setLocationAndAngles(p.getX(), p.getY(), p.getZ(), worldObj.rand.nextFloat() * 360F, 0.0F);
+                    entityLiving.getEntityData().setBoolean("IsSoulShard", true);
                     spawnEntity(entityLiving);
                     entityLiving.spawnExplosionParticle();
+                    //entityLiving.setHealth(0.0F);
                 }
             }
         }
@@ -115,6 +117,7 @@ public class SoulCageTileEntity extends TileEntity implements ITickable {
             boolean needRedstone = Utils.needRedstone(tier);
 
             tick--;
+
             if (tick <= 0) {
                 updateSecond();
                 worldObj.markBlockForUpdate(getPos());
@@ -125,14 +128,13 @@ public class SoulCageTileEntity extends TileEntity implements ITickable {
                 if (getBlockMetadata() == 1) {
                     worldObj.setBlockState(getPos(), getBlockType().getStateFromMeta(SoulCage.EnumType.ACTIVE_SOULCAGE.getDamage()));
                 }
-                return;
             }
 
             if (!needRedstone) {
                 worldObj.setBlockState(getPos(), getBlockType().getStateFromMeta(SoulCage.EnumType.ACTIVE_SOULCAGE.getDamage()));
             }
 
-            if (getBlockMetadata() == 2) {
+            if (getBlockMetadata() == 2 && !isActive) {
                 worldObj.setBlockState(getPos(), getBlockType().getStateFromMeta(SoulCage.EnumType.INACTIVE_SOULCAGE.getDamage()));
             }
         }
@@ -140,14 +142,17 @@ public class SoulCageTileEntity extends TileEntity implements ITickable {
 
     public BlockPos getRandomBlockPos(int range) {
         Random random = new Random();
-        int x = random.nextInt(range * 2) - random.nextInt(range);
+        int x = random.nextInt(range);
         int y = 0;
-        int z = random.nextInt(range * 2) - random.nextInt(range);
+        int z = random.nextInt(range);
+
+        x = random.nextBoolean() ? -x : x;
+        z = random.nextBoolean() ? -z : z;
 
         BlockPos r = new BlockPos(getPos().getX(), getPos().getY(), getPos().getZ()).add(x, y, z);
 
-        if (r .getX() == getPos().getX() && r.getZ() == getPos().getZ())
-            r.add(random.nextInt(range*2) - random.nextInt(range), 0, random.nextInt(range*2) - random.nextInt(range));
+        if (r.getX() == getPos().getX() && r.getZ() == getPos().getZ())
+            r.add(random.nextInt(range * 2) - random.nextInt(range), 0, random.nextInt(range * 2) - random.nextInt(range));
 
         return r;
     }
