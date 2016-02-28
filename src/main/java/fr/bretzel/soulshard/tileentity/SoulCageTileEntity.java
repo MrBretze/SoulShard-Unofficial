@@ -72,9 +72,6 @@ public class SoulCageTileEntity extends TileEntity implements ITickable {
         }
 
         if (!needRedstone) {
-            if (getBlockMetadata() == 1) {
-                worldObj.setBlockState(getPos(), getBlockType().getStateFromMeta(SoulCage.EnumType.UNBOUND_SOULCAGE.getDamage()));
-            }
             updateDelay(false);
             return;
         }
@@ -85,10 +82,32 @@ public class SoulCageTileEntity extends TileEntity implements ITickable {
     @Override
     public void update() {
         if (!worldObj.isRemote) {
+
+            if (!Utils.hasTagCompound(soul_shard))
+                return;
+
+            int tier = Utils.getTier(soul_shard);
+            boolean needRedstone = Utils.needRedstone(tier);
+
             tick--;
             if (tick <= 0) {
                 updateSecond();
                 tick = 20;
+            }
+
+            if (needRedstone && isActive) {
+                if (getBlockMetadata() == 1) {
+                    worldObj.setBlockState(getPos(), getBlockType().getStateFromMeta(SoulCage.EnumType.ACTIVE_SOULCAGE.getDamage()));
+                }
+                return;
+            }
+
+            if (!needRedstone) {
+                worldObj.setBlockState(getPos(), getBlockType().getStateFromMeta(SoulCage.EnumType.ACTIVE_SOULCAGE.getDamage()));
+            }
+
+            if (getBlockMetadata() == 2) {
+                worldObj.setBlockState(getPos(), getBlockType().getStateFromMeta(SoulCage.EnumType.INACTIVE_SOULCAGE.getDamage()));
             }
         }
     }
@@ -106,9 +125,7 @@ public class SoulCageTileEntity extends TileEntity implements ITickable {
      */
     @Override
     public boolean shouldRefresh(World world, BlockPos blockPos, IBlockState oldState, IBlockState newState) {
-        if (oldState.getBlock() != newState.getBlock())
-            return true;
-        return false;
+        return oldState.getBlock() != newState.getBlock();
     }
 
     public ItemStack getSoulShardStack() {
