@@ -25,6 +25,7 @@ public class Utils {
 
     private static final int[] KILL_MOB = {64, 128, 256, 512, 1024};
     private static final int[] TIME = {13, 10, 7, 5, 3};
+    private static final int[] SPAWN_MOB = {2, 4, 4, 4, 6};
     private static final boolean[] NEED_REDSTONE = {false, false, true, true, true};
 
     public static void checkAndFixShard(ItemStack stack) {
@@ -92,6 +93,13 @@ public class Utils {
             stack.getTagCompound().setString(ENTITY_TYPE, SoulShard.mobMapping.getEntityType(entityLiving));
             stack.getTagCompound().setString(DISPLAY_NAME, entityLiving.getCommandSenderEntity().getName());
         }
+    }
+
+    public static int getEntitySpawnForTier(int tier) {
+        if (tier == 5)
+            tier = 4;
+
+        return SPAWN_MOB[tier];
     }
 
     public static boolean isSoulShard(ItemStack stack) {
@@ -190,7 +198,7 @@ public class Utils {
         float f = player.rotationPitch;
         float f1 = player.rotationYaw;
         double d0 = player.posX;
-        double d1 = player.posY + (double)player.getEyeHeight();
+        double d1 = player.posY + (double) player.getEyeHeight();
         double d2 = player.posZ;
         Vec3 vec3 = new Vec3(d0, d1, d2);
         float f2 = MathHelper.cos(-f1 * 0.017453292F - 3.1415927F);
@@ -201,11 +209,11 @@ public class Utils {
         float f7 = f2 * f4;
         double d3 = 5.0D;
 
-        if(player instanceof EntityPlayerMP) {
+        if (player instanceof EntityPlayerMP) {
             d3 = ((EntityPlayerMP) player).theItemInWorldManager.getBlockReachDistance();
         }
 
-        Vec3 vec31 = vec3.addVector((double)f6 * d3, (double)f5 * d3, (double)f7 * d3);
+        Vec3 vec31 = vec3.addVector((double) f6 * d3, (double) f5 * d3, (double) f7 * d3);
         return world.rayTraceBlocks(vec3, vec31, bool, !bool, false);
     }
 

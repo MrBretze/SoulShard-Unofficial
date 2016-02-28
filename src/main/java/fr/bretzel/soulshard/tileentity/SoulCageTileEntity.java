@@ -4,6 +4,7 @@ import fr.bretzel.soulshard.Utils;
 import fr.bretzel.soulshard.block.SoulCage;
 import fr.bretzel.soulshard.registry.ItemRegistry;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.*;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.Packet;
@@ -13,6 +14,7 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.ITickable;
 import net.minecraft.world.World;
 
+import java.util.Random;
 import java.util.UUID;
 
 public class SoulCageTileEntity extends TileEntity implements ITickable {
@@ -49,8 +51,31 @@ public class SoulCageTileEntity extends TileEntity implements ITickable {
 
     }
 
-    public void updateDelay(boolean needRedstone) {
+    public void updateDelay() {
         spawnDelay--;
+
+        int tier = Utils.getTier(soul_shard);
+
+        if (spawnDelay == 0) {
+            spawnDelay = Utils.getTime(tier);
+
+            Entity entity = EntityList.createEntityByName(Utils.getEntityType(soul_shard), worldObj);
+
+            if (entity == null) {
+                return;
+            }
+
+            if (entity instanceof EntityLiving) {
+                int b = Utils.getEntitySpawnForTier(tier);
+                for (int i = b; i >= 0; i--) {
+                    EntityLiving entityLiving = (EntityLiving) entity;
+                    BlockPos p = getRandomBlockPos(4);
+                    entityLiving.setLocationAndAngles(p.getX(), p.getY(), p.getZ(), worldObj.rand.nextFloat() * 360F, 0.0F);
+                    spawnEntity(entityLiving);
+                    entityLiving.spawnExplosionParticle();
+                }
+            }
+        }
     }
 
     public void updateSecond() {
@@ -67,12 +92,12 @@ public class SoulCageTileEntity extends TileEntity implements ITickable {
         boolean needRedstone = Utils.needRedstone(tier);
 
         if (needRedstone && isActive) {
-            updateDelay(true);
+            updateDelay();
             return;
         }
 
         if (!needRedstone) {
-            updateDelay(false);
+            updateDelay();
             return;
         }
 
@@ -92,6 +117,7 @@ public class SoulCageTileEntity extends TileEntity implements ITickable {
             tick--;
             if (tick <= 0) {
                 updateSecond();
+                worldObj.markBlockForUpdate(getPos());
                 tick = 20;
             }
 
@@ -110,6 +136,27 @@ public class SoulCageTileEntity extends TileEntity implements ITickable {
                 worldObj.setBlockState(getPos(), getBlockType().getStateFromMeta(SoulCage.EnumType.INACTIVE_SOULCAGE.getDamage()));
             }
         }
+    }
+
+    public BlockPos getRandomBlockPos(int range) {
+        Random random = new Random();
+        int x = random.nextInt(range * 2) - random.nextInt(range);
+        int y = 0;
+        int z = random.nextInt(range * 2) - random.nextInt(range);
+
+        BlockPos r = new BlockPos(getPos().getX(), getPos().getY(), getPos().getZ()).add(x, y, z);
+
+        if (r .getX() == getPos().getX() && r.getZ() == getPos().getZ())
+            r.add(random.nextInt(range*2) - random.nextInt(range), 0, random.nextInt(range*2) - random.nextInt(range));
+
+        return r;
+    }
+
+    public Entity spawnEntity(Entity entity) {
+        if (entity.worldObj != null)
+            entity.worldObj.spawnEntityInWorld(entity);
+
+        return entity;
     }
 
     @Override
