@@ -1,6 +1,8 @@
 package fr.bretzel.soulshard;
 
 import fr.bretzel.soulshard.item.SoulShardItem;
+
+import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -68,18 +70,13 @@ public class Utils {
         if (!isSoulShard(stack) || isBound(stack) || SoulShard.mobMapping.isMobBlackListed(entityLiving))
             return;
 
-        NBTTagCompound compound = new NBTTagCompound();
-
         if (stack.getItemDamage() == SoulShardItem.EnumType.UNBOUND.getDamage()) {
             stack.setItemDamage(1);
             Utils.checkAndFixShard(stack);
         }
 
         if (stack.getItemDamage() != SoulShardItem.EnumType.UNBOUND.getDamage()) {
-
-            entityLiving.writeEntityToNBT(compound);
-
-            stack.getTagCompound().setString(ENTITY_TYPE, SoulShard.mobMapping.getEntityType(entityLiving));
+            stack.getTagCompound().setString(ENTITY_TYPE, EntityList.getEntityString(entityLiving));
             stack.getTagCompound().setString(DISPLAY_NAME, entityLiving.getCommandSenderEntity().getName());
         }
     }

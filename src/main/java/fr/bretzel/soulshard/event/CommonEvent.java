@@ -4,7 +4,9 @@ import fr.bretzel.soulshard.SoulShard;
 import fr.bretzel.soulshard.Utils;
 import fr.bretzel.soulshard.item.SoulShardItem;
 import fr.bretzel.soulshard.registry.ItemRegistry;
+
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -29,7 +31,7 @@ public class CommonEvent {
 
         EntityPlayer player = (EntityPlayer) event.source.getEntity();
 
-        String entName = SoulShard.mobMapping.getEntityType(dead);
+        String entName = EntityList.getEntityString(dead);
 
         if (entName == null || entName.isEmpty())
             return;

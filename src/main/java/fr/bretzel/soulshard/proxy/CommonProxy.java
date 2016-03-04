@@ -2,6 +2,7 @@ package fr.bretzel.soulshard.proxy;
 
 import fr.bretzel.soulshard.MobMapping;
 import fr.bretzel.soulshard.SoulShard;
+import fr.bretzel.soulshard.command.SoulShardCommand;
 import fr.bretzel.soulshard.event.CommonEvent;
 import fr.bretzel.soulshard.registry.BlockRegistry;
 import fr.bretzel.soulshard.registry.CommonRegistry;
@@ -36,6 +37,7 @@ public class CommonProxy {
 
     public void loadWorld(FMLServerStartingEvent event) {
         SoulShard.mobMapping = getMapping(event.getServer().getEntityWorld());
+        event.registerServerCommand(new SoulShardCommand());
     }
 
     public MobMapping getMapping(World world) {
