@@ -126,6 +126,15 @@ public class MobMapping {
         blackList.add("Monster");
     }
 
+    public static EntityLiving getSpawnedEntity(String entityID, World world) {
+        if (!EntityList.isStringValidEntityName(entityID)) {
+            SoulShard.soulLog.info("Unknow entity detected ! :" + entityID);
+            return null;
+        }
+
+        return (EntityLiving) EntityList.createEntityByName(entityID, world);
+    }
+
     public World getWorld() {
         return world;
     }

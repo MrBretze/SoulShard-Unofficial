@@ -23,6 +23,7 @@ import net.minecraft.world.World;
 
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 public class SoulCage extends Block implements IMetaBlockName {
 
@@ -82,7 +83,7 @@ public class SoulCage extends Block implements IMetaBlockName {
 
     @Override
     public int damageDropped(IBlockState state) {
-        return getMetaFromState(state);
+        return 0;
     }
 
     @Override
@@ -160,7 +161,7 @@ public class SoulCage extends Block implements IMetaBlockName {
                 player.addChatComponentMessage(new ChatComponentText("KillCount: " + Utils.getKillCount(soulTile.soul_shard)));
                 player.addChatComponentMessage(new ChatComponentText("Need Redstone: " + Utils.needRedstone(Utils.getTier(soulTile.soul_shard))));
                 player.addChatComponentMessage(new ChatComponentText("Spawner delay: " + Utils.getTime(Utils.getTier(soulTile.soul_shard))));
-                player.addChatComponentMessage(new ChatComponentText("Entity type: " + Utils.getEntityType(soulTile.soul_shard)));
+                player.addChatComponentMessage(new ChatComponentText("Entity type: " + Utils.getDisplayName(soulTile.soul_shard)));
             }
         }
         return false;

@@ -5,6 +5,7 @@ import fr.bretzel.soulshard.SoulShard;
 import fr.bretzel.soulshard.event.CommonEvent;
 import fr.bretzel.soulshard.registry.BlockRegistry;
 import fr.bretzel.soulshard.registry.CommonRegistry;
+import fr.bretzel.soulshard.registry.CraftingRegistry;
 import fr.bretzel.soulshard.registry.ItemRegistry;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
@@ -30,7 +31,7 @@ public class CommonProxy {
     }
 
     public void postInit(FMLPostInitializationEvent e) {
-
+        CraftingRegistry.registerCraft();
     }
 
     public void loadWorld(FMLServerStartingEvent event) {

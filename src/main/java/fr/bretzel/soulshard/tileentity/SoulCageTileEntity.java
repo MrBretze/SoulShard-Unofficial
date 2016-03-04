@@ -1,5 +1,7 @@
 package fr.bretzel.soulshard.tileentity;
 
+import fr.bretzel.soulshard.SoulShard;
+import fr.bretzel.soulshard.SpawnerManager;
 import fr.bretzel.soulshard.Utils;
 import fr.bretzel.soulshard.block.SoulCage;
 import fr.bretzel.soulshard.registry.ItemRegistry;
@@ -15,6 +17,7 @@ import net.minecraft.util.ITickable;
 import net.minecraft.world.World;
 
 import java.util.Random;
+import java.util.UUID;
 
 public class SoulCageTileEntity extends TileEntity implements ITickable {
 
@@ -22,6 +25,14 @@ public class SoulCageTileEntity extends TileEntity implements ITickable {
     public boolean isActive = false;
     public int tick = 20;
     public int spawnDelay = Integer.MAX_VALUE;
+    public UUID uuid;
+
+    public SpawnerManager spawnerManager;
+
+    public SoulCageTileEntity() {
+        this.uuid = UUID.randomUUID();
+        spawnerManager = new SpawnerManager(this);
+    }
 
     @Override
     public void writeToNBT(NBTTagCompound compound) {
@@ -29,6 +40,7 @@ public class SoulCageTileEntity extends TileEntity implements ITickable {
 
         compound.setBoolean("Active", isActive);
         compound.setInteger("Ticks", tick);
+        compound.setString("UUID", uuid.toString());
 
         if (soul_shard != null) {
             NBTTagCompound ntcp = new NBTTagCompound();
@@ -43,6 +55,7 @@ public class SoulCageTileEntity extends TileEntity implements ITickable {
 
         isActive = compound.getBoolean("Active");
         tick = compound.getInteger("Ticks");
+        uuid = UUID.fromString(compound.getString("UUID"));
 
         if (compound.hasKey("SoulShard"))
             soul_shard = ItemStack.loadItemStackFromNBT(compound.getCompoundTag("SoulShard"));
@@ -59,7 +72,7 @@ public class SoulCageTileEntity extends TileEntity implements ITickable {
             spawnDelay = Utils.getTime(tier);
             int b = Utils.getEntitySpawnForTier(tier);
 
-            for (int i = b; i >= 0; i--) {
+            for (int i = b; i > 0; i--) {
 
                 Entity entity = EntityList.createEntityByName(Utils.getEntityType(soul_shard), worldObj);
 
@@ -70,11 +83,12 @@ public class SoulCageTileEntity extends TileEntity implements ITickable {
                 if (entity instanceof EntityLiving) {
                     EntityLiving entityLiving = (EntityLiving) entity;
                     BlockPos p = getRandomBlockPos(4);
+                    SoulShard.soulLog.info(getPos().distanceSqToCenter(p.getX(), p.getY(), p.getZ()));
                     entityLiving.setLocationAndAngles(p.getX(), p.getY(), p.getZ(), worldObj.rand.nextFloat() * 360F, 0.0F);
                     entityLiving.getEntityData().setBoolean("IsSoulShard", true);
                     spawnEntity(entityLiving);
                     entityLiving.spawnExplosionParticle();
-                    //entityLiving.setHealth(0.0F);
+                    entityLiving.setHealth(0.0F);
                 }
             }
         }
@@ -127,21 +141,25 @@ public class SoulCageTileEntity extends TileEntity implements ITickable {
             if (needRedstone && isActive) {
                 if (getBlockMetadata() == 1) {
                     worldObj.setBlockState(getPos(), getBlockType().getStateFromMeta(SoulCage.EnumType.ACTIVE_SOULCAGE.getDamage()));
+                    return;
                 }
             }
 
             if (!needRedstone) {
                 worldObj.setBlockState(getPos(), getBlockType().getStateFromMeta(SoulCage.EnumType.ACTIVE_SOULCAGE.getDamage()));
+                return;
             }
 
             if (getBlockMetadata() == 2 && !isActive) {
                 worldObj.setBlockState(getPos(), getBlockType().getStateFromMeta(SoulCage.EnumType.INACTIVE_SOULCAGE.getDamage()));
+                return;
             }
         }
     }
 
     public BlockPos getRandomBlockPos(int range) {
         Random random = new Random();
+
         int x = random.nextInt(range);
         int y = 0;
         int z = random.nextInt(range);
@@ -151,8 +169,8 @@ public class SoulCageTileEntity extends TileEntity implements ITickable {
 
         BlockPos r = new BlockPos(getPos().getX(), getPos().getY(), getPos().getZ()).add(x, y, z);
 
-        if (r.getX() == getPos().getX() && r.getZ() == getPos().getZ())
-            r.add(random.nextInt(range * 2) - random.nextInt(range), 0, random.nextInt(range * 2) - random.nextInt(range));
+        if (getPos().distanceSqToCenter(r.getX(), r.getY(), r.getZ()) <= 1)
+            return getRandomBlockPos(range);
 
         return r;
     }
