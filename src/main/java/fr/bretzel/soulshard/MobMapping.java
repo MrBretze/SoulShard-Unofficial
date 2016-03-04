@@ -11,9 +11,7 @@ import net.minecraftforge.common.config.Configuration;
 
 import java.io.File;
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -48,22 +46,40 @@ public class MobMapping {
     }
 
     public boolean isMobBlackListed(EntityLiving entityLiving) {
-        return entityLiving.hasCustomName() ? isMobBlackListed(EntityList.getEntityString(entityLiving)) : isMobBlackListed(entityLiving.getName());
+        return isMobBlackListed(EntityList.getEntityString(entityLiving));
     }
 
     public static boolean isLoaded() {
         return loaded;
     }
 
-    public String getEntityType(EntityLiving entityLiving) {
-        String name = EntityList.getEntityString(entityLiving);
-        if (entityList.contains(name))
-            return name;
-        else {
-            name = (String) ((HashMap) EntityList.classToStringMapping).get(entityLiving.getClass());
-            SoulShard.soulLog.info("New EntityType is detected " + name + ".");
-            return name;
+    private void loadEntityList() {
+
+        for (Map.Entry<Class<? extends Entity>, String> entry : EntityList.classToStringMapping.entrySet()) {
+            if (entityList.contains(entry.getValue())) {
+                SoulShard.soulLog.info("SoulShard: Skipping mapping for " + entry.getValue() + ": already mapped.");
+            } else if (IBossDisplayData.class.isAssignableFrom(entry.getKey())) {
+                SoulShard.soulLog.info("SoulShard: Skipping mapping for " + entry.getValue() + ": detected as boss.");
+                blackList.add(entry.getValue());
+            } else if (EntityLiving.class.isAssignableFrom(entry.getKey())) {
+                if (SoulShard.debug) {
+                    SoulShard.soulLog.info("SoulShard: Mapped new entity " + entry.getValue());
+                }
+                entityList.add(entry.getValue());
+            }
         }
+
+        entityList.add("Wither Skeleton");
+
+        DecimalFormat format = new DecimalFormat("00");
+
+        SoulShard.soulLog.info("===================================================");
+        SoulShard.soulLog.info("=================== SOUL SHARD ====================");
+        SoulShard.soulLog.info("===================================================");
+        SoulShard.soulLog.info("============== TOTAL ENTITY MAPPED: " + entityList.size() + " ============");
+        SoulShard.soulLog.info("===================================================");
+        SoulShard.soulLog.info("============ BLACKLISTED ENTITY: " + format.format(blackList.size()) + " ===============");
+        SoulShard.soulLog.info("===================================================");
     }
 
     private void loadConfig() {
@@ -92,47 +108,9 @@ public class MobMapping {
         }
     }
 
-    private void loadEntityList() {
-
-        for (Map.Entry<Class<? extends Entity>, String> entry : EntityList.classToStringMapping.entrySet()) {
-            if (entityList.contains(entry.getValue())) {
-                SoulShard.soulLog.info("SoulShard: Skipping mapping for " + entry.getValue() + ": already mapped.");
-            } else if (IBossDisplayData.class.isAssignableFrom(entry.getKey())) {
-                SoulShard.soulLog.info("SoulShard: Skipping mapping for " + entry.getValue() + ": detected as boss.");
-                blackList.add(entry.getValue());
-            } else if (EntityLiving.class.isAssignableFrom(entry.getKey())) {
-                if (SoulShard.debug) {
-                    SoulShard.soulLog.info("SoulShard: Mapped new entity " + entry.getValue());
-                }
-                entityList.add(entry.getValue());
-            }
-        }
-
-        entityList.add("Wither Skeleton");
-
-        NumberFormat format = new DecimalFormat("##");
-
-        SoulShard.soulLog.info("===================================================");
-        SoulShard.soulLog.info("=================== SOUL SHARD ====================");
-        SoulShard.soulLog.info("===================================================");
-        SoulShard.soulLog.info("============== TOTAL ENTITY MAPPED: " + entityList.size() + " ============");
-        SoulShard.soulLog.info("===================================================");
-        SoulShard.soulLog.info("============ BLACKLISTED ENTITY: " + format.format(blackList.size()) + " ===============");
-        SoulShard.soulLog.info("===================================================");
-    }
-
     private void loadDefaultBlackList() {
         blackList.add("Giant");
         blackList.add("Monster");
-    }
-
-    public static EntityLiving getSpawnedEntity(String entityID, World world) {
-        if (!EntityList.isStringValidEntityName(entityID)) {
-            SoulShard.soulLog.info("Unknow entity detected ! :" + entityID);
-            return null;
-        }
-
-        return (EntityLiving) EntityList.createEntityByName(entityID, world);
     }
 
     public World getWorld() {
