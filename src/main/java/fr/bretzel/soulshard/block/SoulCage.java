@@ -7,34 +7,32 @@ import fr.bretzel.soulshard.block.meta.IMetaBlockName;
 import fr.bretzel.soulshard.item.SoulShardItem;
 import fr.bretzel.soulshard.registry.CommonRegistry;
 import fr.bretzel.soulshard.tileentity.SoulCageTileEntity;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.world.World;
 
 import java.util.List;
-import java.util.Random;
-import java.util.UUID;
 
 public class SoulCage extends Block implements IMetaBlockName {
 
     public static final PropertyEnum METADATA = PropertyEnum.create("type", SoulCage.EnumType.class);
 
-    public String resource_name = "";
-
     public SoulCage(String unlocalizedName, Material material, float hardness, float resistance) {
         super(material);
 
-        resource_name = unlocalizedName;
         this.setUnlocalizedName(unlocalizedName);
         this.setHardness(hardness);
         this.setResistance(resistance);
@@ -43,16 +41,31 @@ public class SoulCage extends Block implements IMetaBlockName {
     }
 
     @Override
-    public void onNeighborBlockChange(World world, BlockPos blockPos, IBlockState state, Block block) {
-        EnumType type = (EnumType) state.getValue(METADATA);
-        if (world.getTileEntity(blockPos) == null && !(world.getTileEntity(blockPos) instanceof SoulCageTileEntity) && type == EnumType.UNBOUND_SOULCAGE)
-            return;
+    public void breakBlock(World p_breakBlock_1_, BlockPos p_breakBlock_2_, IBlockState p_breakBlock_3_) {
+        onBlockDestroyed(p_breakBlock_1_, p_breakBlock_2_);
+    }
 
-        SoulCageTileEntity soulTile = (SoulCageTileEntity) world.getTileEntity(blockPos);
-
-        if (soulTile.soul_shard != null) {
-            soulTile.isActive = world.isBlockPowered(blockPos);
+    public void onBlockDestroyed(World world, BlockPos pos) {
+        if (world.getTileEntity(pos) != null && world.getTileEntity(pos) instanceof SoulCageTileEntity) {
+            SoulCageTileEntity tileEntity = (SoulCageTileEntity) world.getTileEntity(pos);
+            if (tileEntity.soul_shard != null) {
+                ItemStack stack = new ItemStack(Item.getItemFromBlock(this), 1, 1);
+                NBTTagCompound compound = new NBTTagCompound();
+                compound.setTag("SoulShard", tileEntity.soul_shard.serializeNBT());
+                EntityItem item = new EntityItem(world, 0.5, 0.5, 0.5, stack);
+                item.getEntityData().setTag("SoulShard", tileEntity.soul_shard.serializeNBT());
+                world.spawnEntityInWorld(item);
+            } else {
+                ItemStack stack = new ItemStack(Item.getItemFromBlock(this), 1, 0);
+                world.spawnEntityInWorld(new EntityItem(world, 0.5, 0.5, 0.5, stack));
+            }
+            world.removeTileEntity(pos);
         }
+    }
+
+    @Override
+    public IBlockState onBlockPlaced(World p_onBlockPlaced_1_, BlockPos p_onBlockPlaced_2_, EnumFacing p_onBlockPlaced_3_, float p_onBlockPlaced_4_, float p_onBlockPlaced_5_, float p_onBlockPlaced_6_, int p_onBlockPlaced_7_, EntityLivingBase p_onBlockPlaced_8_) {
+        return super.onBlockPlaced(p_onBlockPlaced_1_, p_onBlockPlaced_2_, p_onBlockPlaced_3_, p_onBlockPlaced_4_, p_onBlockPlaced_5_, p_onBlockPlaced_6_, p_onBlockPlaced_7_, p_onBlockPlaced_8_);
     }
 
     @Override
@@ -77,13 +90,12 @@ public class SoulCage extends Block implements IMetaBlockName {
 
     @Override
     public int getMetaFromState(IBlockState state) {
-        EnumType type = (EnumType) state.getValue(METADATA);
-        return type.getDamage();
+        return ((EnumType) state.getValue(METADATA)).getDamage();
     }
 
     @Override
     public int damageDropped(IBlockState state) {
-        return 0;
+        return ((EnumType) state.getValue(METADATA)).getDamage();
     }
 
     @Override
@@ -149,7 +161,7 @@ public class SoulCage extends Block implements IMetaBlockName {
                 if (soulTile.soul_shard != null) {
                     world.spawnEntityInWorld(new EntityItem(world, blockPos.getX() + 0.5, blockPos.getY() + 0.6, blockPos.getZ() + 0.5, soulTile.getSoulShardStack()));
                     world.setBlockState(blockPos, getStateFromMeta(EnumType.UNBOUND_SOULCAGE.getDamage()));
-                    soulTile.soul_shard = null;
+                    soulTile.setSoul_shard(null);
                 }
 
                 return true;

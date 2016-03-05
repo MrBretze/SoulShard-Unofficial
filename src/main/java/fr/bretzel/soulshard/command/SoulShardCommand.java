@@ -46,7 +46,7 @@ public class SoulShardCommand extends CommandBase {
                 return;
             }
         } else {
-            iCommandSender.addChatMessage(new ChatComponentText("soulshard kill"));
+            iCommandSender.addChatMessage(new ChatComponentText("/soulshard kill"));
             return;
         }
     }

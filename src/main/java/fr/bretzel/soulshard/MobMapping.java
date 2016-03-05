@@ -2,6 +2,7 @@ package fr.bretzel.soulshard;
 
 import fr.bretzel.soulshard.config.MobConfig;
 import fr.bretzel.soulshard.registry.CommonRegistry;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
@@ -41,6 +42,12 @@ public class MobMapping {
         }
     }
 
+    public void addMobBlackListed(String entityID) {
+        if (EntityList.isStringValidEntityName(entityID)) {
+            blackList.add(entityID);
+        }
+    }
+
     public boolean isMobBlackListed(String name) {
         return blackList.contains(name);
     }
@@ -60,7 +67,7 @@ public class MobMapping {
                 SoulShard.soulLog.info("SoulShard: Skipping mapping for " + entry.getValue() + ": already mapped.");
             } else if (IBossDisplayData.class.isAssignableFrom(entry.getKey())) {
                 SoulShard.soulLog.info("SoulShard: Skipping mapping for " + entry.getValue() + ": detected as boss.");
-                blackList.add(entry.getValue());
+                addMobBlackListed(entry.getValue());
             } else if (EntityLiving.class.isAssignableFrom(entry.getKey())) {
                 if (SoulShard.debug) {
                     SoulShard.soulLog.info("SoulShard: Mapped new entity " + entry.getValue());

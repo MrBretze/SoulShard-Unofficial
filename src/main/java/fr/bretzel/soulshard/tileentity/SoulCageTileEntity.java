@@ -1,9 +1,9 @@
 package fr.bretzel.soulshard.tileentity;
 
-import fr.bretzel.soulshard.SoulShard;
 import fr.bretzel.soulshard.Utils;
 import fr.bretzel.soulshard.block.SoulCage;
 import fr.bretzel.soulshard.registry.ItemRegistry;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.*;
 import net.minecraft.item.ItemStack;
@@ -15,18 +15,19 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.ITickable;
 import net.minecraft.world.World;
 
+import java.util.UUID;
+
 public class SoulCageTileEntity extends TileEntity implements ITickable {
 
     public ItemStack soul_shard;
-    public boolean isActive = false;
     public int tick = 20;
     public int spawnDelay = Integer.MAX_VALUE;
+    public UUID uuid;
 
     @Override
     public void writeToNBT(NBTTagCompound compound) {
         super.writeToNBT(compound);
 
-        compound.setBoolean("Active", isActive);
         compound.setInteger("Ticks", tick);
 
         if (soul_shard != null) {
@@ -40,7 +41,6 @@ public class SoulCageTileEntity extends TileEntity implements ITickable {
     public void readFromNBT(NBTTagCompound compound) {
         super.readFromNBT(compound);
 
-        isActive = compound.getBoolean("Active");
         tick = compound.getInteger("Ticks");
 
         if (compound.hasKey("SoulShard"))
@@ -98,6 +98,7 @@ public class SoulCageTileEntity extends TileEntity implements ITickable {
         }
 
         boolean needRedstone = Utils.needRedstone(tier);
+        boolean isActive = worldObj.isBlockPowered(getPos());
 
         if (needRedstone && isActive) {
             updateDelay();
@@ -115,6 +116,8 @@ public class SoulCageTileEntity extends TileEntity implements ITickable {
     @Override
     public void update() {
         if (!worldObj.isRemote) {
+
+            boolean isActive = worldObj.isBlockPowered(getPos());
 
             if (!Utils.hasTagCompound(soul_shard))
                 return;
@@ -176,5 +179,9 @@ public class SoulCageTileEntity extends TileEntity implements ITickable {
         ItemStack stack = new ItemStack(ItemRegistry.soulShard, 1, soul_shard.getItemDamage());
         stack.setTagCompound(soul_shard.getTagCompound());
         return stack;
+    }
+
+    public void setSoul_shard(ItemStack stack) {
+        this.soul_shard = stack;
     }
 }
