@@ -26,7 +26,7 @@ public class CommonEvent {
 
         EntityLiving dead = (EntityLiving) event.entity;
 
-        if (dead.getEntityData().hasKey("IsSoulShard") && dead.getEntityData().getBoolean("IsSoulShard"))
+        if (dead.getEntityData().getBoolean("IsSoulShard"))
             return;
 
         EntityPlayer player = (EntityPlayer) event.source.getEntity();
