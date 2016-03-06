@@ -1,7 +1,6 @@
 package fr.bretzel.soulshard.block;
 
 
-import fr.bretzel.soulshard.SoulShard;
 import fr.bretzel.soulshard.Utils;
 import fr.bretzel.soulshard.block.meta.IMetaBlockName;
 import fr.bretzel.soulshard.item.SoulShardItem;
@@ -19,7 +18,6 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.world.World;
@@ -41,24 +39,11 @@ public class SoulCage extends Block implements IMetaBlockName {
     }
 
     @Override
-    public void breakBlock(World p_breakBlock_1_, BlockPos p_breakBlock_2_, IBlockState p_breakBlock_3_) {
-        onBlockDestroyed(p_breakBlock_1_, p_breakBlock_2_);
-    }
-
-    public void onBlockDestroyed(World world, BlockPos pos) {
+    public void breakBlock(World world, BlockPos pos, IBlockState state) {
         if (world.getTileEntity(pos) != null && world.getTileEntity(pos) instanceof SoulCageTileEntity) {
             SoulCageTileEntity tileEntity = (SoulCageTileEntity) world.getTileEntity(pos);
-            if (tileEntity.soul_shard != null) {
-                ItemStack stack = new ItemStack(Item.getItemFromBlock(this), 1, 1);
-                NBTTagCompound compound = new NBTTagCompound();
-                compound.setTag("SoulShard", tileEntity.soul_shard.serializeNBT());
-                EntityItem item = new EntityItem(world, 0.5, 0.5, 0.5, stack);
-                item.getEntityData().setTag("SoulShard", tileEntity.soul_shard.serializeNBT());
-                world.spawnEntityInWorld(item);
-            } else {
-                ItemStack stack = new ItemStack(Item.getItemFromBlock(this), 1, 0);
-                world.spawnEntityInWorld(new EntityItem(world, 0.5, 0.5, 0.5, stack));
-            }
+            if (tileEntity.soul_shard != null)
+                world.spawnEntityInWorld(new EntityItem(world, pos.getX() + 0.5, pos.getY() + 0.6, pos.getZ() + 0.5, tileEntity.getSoulShardStack()));
             world.removeTileEntity(pos);
         }
     }
@@ -95,7 +80,7 @@ public class SoulCage extends Block implements IMetaBlockName {
 
     @Override
     public int damageDropped(IBlockState state) {
-        return ((EnumType) state.getValue(METADATA)).getDamage();
+        return 0;
     }
 
     @Override
@@ -165,15 +150,6 @@ public class SoulCage extends Block implements IMetaBlockName {
                 }
 
                 return true;
-            }
-
-            if (player.getHeldItem() == null && soulTile.soul_shard != null) {
-                player.addChatComponentMessage(new ChatComponentText("Soul Cage Info"));
-                player.addChatComponentMessage(new ChatComponentText("Tier: " + Utils.getTier(soulTile.soul_shard)));
-                player.addChatComponentMessage(new ChatComponentText("KillCount: " + Utils.getKillCount(soulTile.soul_shard)));
-                player.addChatComponentMessage(new ChatComponentText("Need Redstone: " + Utils.needRedstone(Utils.getTier(soulTile.soul_shard))));
-                player.addChatComponentMessage(new ChatComponentText("Spawner delay: " + Utils.getTime(Utils.getTier(soulTile.soul_shard))));
-                player.addChatComponentMessage(new ChatComponentText("Entity type: " + Utils.getDisplayName(soulTile.soul_shard)));
             }
         }
         return false;

@@ -43,7 +43,7 @@ public class MobMapping {
     }
 
     public void addMobBlackListed(String entityID) {
-        if (EntityList.isStringValidEntityName(entityID)) {
+        if (EntityList.isStringValidEntityName(entityID) && !blackList.contains(entityID)) {
             blackList.add(entityID);
         }
     }
