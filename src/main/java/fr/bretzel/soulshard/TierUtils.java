@@ -9,8 +9,16 @@ public class TierUtils {
         NEED_PLAYER[getValidTier(tier)] = value;
     }
 
+    public static boolean getPlayerCheck(int tier) {
+        return NEED_PLAYER[getValidTier(tier)];
+    }
+
     public static void setWorldChecks(int tier, boolean value) {
         CHECKS_WORLD[getValidTier(tier)] = value;
+    }
+
+    public static boolean getWorldChecks(int tier) {
+        return CHECKS_WORLD[getValidTier(tier)];
     }
 
     private static int getValidTier(int tier) {

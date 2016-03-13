@@ -42,7 +42,7 @@ public class SoulCage extends Block implements IMetaBlockName {
     public void breakBlock(World world, BlockPos pos, IBlockState state) {
         if (world.getTileEntity(pos) != null && world.getTileEntity(pos) instanceof SoulCageTileEntity) {
             SoulCageTileEntity tileEntity = (SoulCageTileEntity) world.getTileEntity(pos);
-            if (tileEntity.soul_shard != null)
+            if (tileEntity.getSoulShard() != null)
                 world.spawnEntityInWorld(new EntityItem(world, pos.getX() + 0.5, pos.getY() + 0.6, pos.getZ() + 0.5, tileEntity.getSoulShardStack()));
             world.removeTileEntity(pos);
         }
@@ -119,7 +119,7 @@ public class SoulCage extends Block implements IMetaBlockName {
 
             SoulCageTileEntity soulTile = (SoulCageTileEntity) tile;
 
-            if (player.getHeldItem() != null && player.getHeldItem().getItem() instanceof SoulShardItem && soulTile.soul_shard == null) {
+            if (player.getHeldItem() != null && player.getHeldItem().getItem() instanceof SoulShardItem && soulTile.getSoulShard() == null) {
 
                 ItemStack soulStack = player.getHeldItem();
 
@@ -131,7 +131,7 @@ public class SoulCage extends Block implements IMetaBlockName {
                     if (tier == 0 || entName.isEmpty() || entName.equals("null"))
                         return false;
 
-                    soulTile.soul_shard = soulStack;
+                    soulTile.setSoulShard(soulStack);
 
                     world.setBlockState(blockPos, getStateFromMeta(EnumType.INACTIVE_SOULCAGE.getDamage()));
 
@@ -143,10 +143,10 @@ public class SoulCage extends Block implements IMetaBlockName {
             }
 
             if (player.getHeldItem() == null && player.isSneaking()) {
-                if (soulTile.soul_shard != null) {
+                if (soulTile.getSoulShard() != null) {
                     world.spawnEntityInWorld(new EntityItem(world, blockPos.getX() + 0.5, blockPos.getY() + 0.6, blockPos.getZ() + 0.5, soulTile.getSoulShardStack()));
                     world.setBlockState(blockPos, getStateFromMeta(EnumType.UNBOUND_SOULCAGE.getDamage()));
-                    soulTile.setSoul_shard(null);
+                    soulTile.setSoulShard(null);
                 }
 
                 return true;

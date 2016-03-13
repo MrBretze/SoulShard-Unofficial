@@ -42,24 +42,6 @@ public class MobMapping {
         }
     }
 
-    public void addMobBlackListed(String entityID) {
-        if (EntityList.isStringValidEntityName(entityID) && !blackList.contains(entityID)) {
-            blackList.add(entityID);
-        }
-    }
-
-    public boolean isMobBlackListed(String name) {
-        return blackList.contains(name);
-    }
-
-    public boolean isMobBlackListed(EntityLiving entityLiving) {
-        return isMobBlackListed(EntityList.getEntityString(entityLiving));
-    }
-
-    public static boolean isLoaded() {
-        return loaded;
-    }
-
     private void loadEntityList() {
 
         for (Map.Entry<Class<? extends Entity>, String> entry : EntityList.classToStringMapping.entrySet()) {
@@ -83,7 +65,7 @@ public class MobMapping {
         SoulShard.soulLog.info("===================================================");
         SoulShard.soulLog.info("=================== SOUL SHARD ====================");
         SoulShard.soulLog.info("===================================================");
-        SoulShard.soulLog.info("============== TOTAL ENTITY MAPPED: " + entityList.size() + " ============");
+        SoulShard.soulLog.info("============== TOTAL ENTITY MAPPED: " + format.format(entityList.size()) + " ============");
         SoulShard.soulLog.info("===================================================");
         SoulShard.soulLog.info("============ BLACKLISTED ENTITY: " + format.format(blackList.size()) + " ===============");
         SoulShard.soulLog.info("===================================================");
@@ -116,11 +98,25 @@ public class MobMapping {
     }
 
     private void loadDefaultBlackList() {
-        blackList.add("Giant");
-        blackList.add("Monster");
+        addMobBlackListed("Giant");
+        addMobBlackListed("Monster");
     }
 
-    public World getWorld() {
-        return world;
+    public void addMobBlackListed(String entityID) {
+        if (EntityList.isStringValidEntityName(entityID) && !blackList.contains(entityID)) {
+            blackList.add(entityID);
+        }
+    }
+
+    public boolean isMobBlackListed(String name) {
+        return blackList.contains(name);
+    }
+
+    public boolean isMobBlackListed(EntityLiving entityLiving) {
+        return isMobBlackListed(EntityList.getEntityString(entityLiving));
+    }
+
+    public static boolean isLoaded() {
+        return loaded;
     }
 }

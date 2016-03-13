@@ -17,15 +17,11 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.ITickable;
 import net.minecraft.world.World;
 
-import java.util.Random;
-import java.util.UUID;
-
 public class SoulCageTileEntity extends TileEntity implements ITickable {
 
-    public ItemStack soul_shard;
-    public int tick = 0;
-    public int spawnDelay = Integer.MAX_VALUE;
-    public UUID uuid;
+    private ItemStack soul_shard;
+    private int tick = 0;
+    private int spawnDelay = Integer.MAX_VALUE;
 
     @Override
     public void writeToNBT(NBTTagCompound compound) {
@@ -138,7 +134,7 @@ public class SoulCageTileEntity extends TileEntity implements ITickable {
             int tier = Utils.getTier(soul_shard);
             boolean needRedstone = Utils.needRedstone(tier);
 
-            if (getNearbyEntity((EntityLiving) EntityList.createEntityByName(Utils.getEntityType(soul_shard), worldObj)) >= 79) {
+            if (getNearbyEntity((EntityLiving) EntityList.createEntityByName(Utils.getEntityType(soul_shard), worldObj)) >= 80) {
                 worldObj.setBlockState(getPos(), getBlockType().getStateFromMeta(SoulCage.EnumType.INACTIVE_SOULCAGE.getDamage()));
                 tick = 20;
                 return;
@@ -167,7 +163,6 @@ public class SoulCageTileEntity extends TileEntity implements ITickable {
 
             if (getBlockMetadata() == 2 && !isActive) {
                 worldObj.setBlockState(getPos(), getBlockType().getStateFromMeta(SoulCage.EnumType.INACTIVE_SOULCAGE.getDamage()));
-                return;
             }
         }
     }
@@ -209,6 +204,22 @@ public class SoulCageTileEntity extends TileEntity implements ITickable {
         return r;
     }
 
+    public int getTick() {
+        return tick;
+    }
+
+    public int getSpawnDelay() {
+        return spawnDelay;
+    }
+
+    public ItemStack getSoulShard() {
+        return soul_shard;
+    }
+
+    public void setSoulShard(ItemStack stack) {
+        this.soul_shard = stack;
+    }
+
     /**
      * Tanks modmuss50: (https://github.com/TechReborn/RebornCore/blob/1.8.9/src%2Fmain%2Fjava%2Freborncore%2Fcommon%2Ftile%2FTileMachineBase.java#L74)
      */
@@ -221,9 +232,5 @@ public class SoulCageTileEntity extends TileEntity implements ITickable {
         ItemStack stack = new ItemStack(ItemRegistry.soulShard, 1, soul_shard.getItemDamage());
         stack.setTagCompound(soul_shard.getTagCompound());
         return stack;
-    }
-
-    public void setSoul_shard(ItemStack stack) {
-        this.soul_shard = stack;
     }
 }
