@@ -17,11 +17,6 @@ public class Utils {
     public static final String TIER = "Tier";
     public static final String DISPLAY_NAME = "DisplayName";
 
-    private static final int[] KILL_MOB = {64, 128, 256, 512, 1024};
-    private static final int[] TIME = {13, 10, 7, 5, 3};
-    private static final int[] SPAWN_MOB = {2, 4, 4, 4, 6};
-    private static final boolean[] NEED_REDSTONE = {false, false, true, true, true};
-
     public static void checkAndFixShard(ItemStack stack) {
 
         if (!isSoulShard(stack)) {
@@ -38,18 +33,15 @@ public class Utils {
 
         int tier = getTier(stack);
 
-        if (getKillCount(stack) >= getMaxKillForTier(tier) && tier <= 5) {
+        if (getKillCount(stack) >= TierUtils.getMobKill(tier + 1) && tier < 5) {
 
             tier++;
 
-            if (tier > 5)
-                tier = 5;
-
-            setTier(stack, tier);
+            setTier(stack, TierUtils.getValidTier(tier));
         }
 
-        if (getKillCount(stack) > getMaxKillForTier(5))
-            setKillCount(stack, getMaxKillForTier(5));
+        if (getKillCount(stack) > TierUtils.getMobKill(5))
+            setKillCount(stack, TierUtils.getMobKill(5));
 
         if (stack.getItemDamage() != getDamageForTier(getTier(stack)))
             stack.setItemDamage(getDamageForTier(getTier(stack)));
@@ -81,40 +73,12 @@ public class Utils {
         }
     }
 
-    public static int getEntitySpawnForTier(int tier) {
-        if (tier == 5)
-            tier = 4;
-
-        return SPAWN_MOB[tier];
-    }
-
     public static boolean isSoulShard(ItemStack stack) {
         return stack.getItem() instanceof SoulShardItem;
     }
 
     public static boolean isBound(ItemStack stack) {
         return hasTagCompound(stack) && stack.getTagCompound().hasKey(ENTITY_TYPE) && !stack.getTagCompound().getString(ENTITY_TYPE).equals("null");
-    }
-
-    public static int getMaxKillForTier(int tier) {
-        if (tier == 5)
-            tier = 4;
-
-        return KILL_MOB[tier];
-    }
-
-    public static int getTime(int tier) {
-        if (tier == 5)
-            tier = 4;
-
-        return TIME[tier];
-    }
-
-    public static boolean needRedstone(int tier) {
-        if (tier == 5)
-            tier = 4;
-
-        return NEED_REDSTONE[tier];
     }
 
     public static String getEntityType(ItemStack stack) {

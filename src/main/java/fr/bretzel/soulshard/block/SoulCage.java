@@ -49,6 +49,13 @@ public class SoulCage extends Block implements IMetaBlockName {
     }
 
     @Override
+    public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
+        if (world.getTileEntity(pos) != null && world.getTileEntity(pos) instanceof SoulCageTileEntity) {
+            ((SoulCageTileEntity)world.getTileEntity(pos)).setOwner(((EntityPlayer)placer).getUniqueID());
+        }
+    }
+
+    @Override
     public IBlockState onBlockPlaced(World p_onBlockPlaced_1_, BlockPos p_onBlockPlaced_2_, EnumFacing p_onBlockPlaced_3_, float p_onBlockPlaced_4_, float p_onBlockPlaced_5_, float p_onBlockPlaced_6_, int p_onBlockPlaced_7_, EntityLivingBase p_onBlockPlaced_8_) {
         return super.onBlockPlaced(p_onBlockPlaced_1_, p_onBlockPlaced_2_, p_onBlockPlaced_3_, p_onBlockPlaced_4_, p_onBlockPlaced_5_, p_onBlockPlaced_6_, p_onBlockPlaced_7_, p_onBlockPlaced_8_);
     }

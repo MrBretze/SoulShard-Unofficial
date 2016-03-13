@@ -1,13 +1,19 @@
 package fr.bretzel.soulshard.tileentity;
 
+import fr.bretzel.soulshard.TierUtils;
 import fr.bretzel.soulshard.Utils;
 import fr.bretzel.soulshard.block.SoulCage;
 import fr.bretzel.soulshard.registry.ItemRegistry;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.*;
+import net.minecraft.entity.monster.EntityMob;
+import net.minecraft.entity.monster.IMob;
+import net.minecraft.entity.passive.EntityAnimal;
+import net.minecraft.entity.passive.IAnimals;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagString;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
@@ -17,11 +23,14 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.ITickable;
 import net.minecraft.world.World;
 
+import java.util.UUID;
+
 public class SoulCageTileEntity extends TileEntity implements ITickable {
 
     private ItemStack soul_shard;
     private int tick = 0;
     private int spawnDelay = Integer.MAX_VALUE;
+    private UUID owner;
 
     @Override
     public void writeToNBT(NBTTagCompound compound) {
@@ -32,6 +41,8 @@ public class SoulCageTileEntity extends TileEntity implements ITickable {
             soul_shard.writeToNBT(ntcp);
             compound.setTag("SoulShard", ntcp);
         }
+
+        compound.setTag("Owner", new NBTTagString(owner.toString()));
     }
 
     @Override
@@ -41,6 +52,7 @@ public class SoulCageTileEntity extends TileEntity implements ITickable {
         if (compound.hasKey("SoulShard"))
             soul_shard = ItemStack.loadItemStackFromNBT(compound.getCompoundTag("SoulShard"));
 
+        owner = UUID.fromString(compound.getString("Owner"));
     }
 
     @Override
@@ -60,28 +72,36 @@ public class SoulCageTileEntity extends TileEntity implements ITickable {
 
         int tier = Utils.getTier(soul_shard);
 
+        boolean needCorrectLight = TierUtils.getCheckLight(tier);
+
         if (spawnDelay <= 0) {
 
-            spawnDelay = Utils.getTime(tier);
-            int b = Utils.getEntitySpawnForTier(tier);
+            spawnDelay = TierUtils.getSpawnDelay(tier);
+            int b = TierUtils.getNumSpawns(tier);
 
             for (int i = b; i > 0; i--) {
 
                 Entity entity = EntityList.createEntityByName(Utils.getEntityType(soul_shard), worldObj);
 
-                if (entity == null && !(entity instanceof EntityLiving)) {
+                if (entity == null) {
                     return;
                 }
 
                 EntityLiving entityLiving = (EntityLiving) entity;
 
                 if (getNearbyEntity(entityLiving) > 80) {
-                    break;
+                    tick = 20;
+                    return;
                 }
 
                 BlockPos pos = getRandomBlockPos(4);
 
                 entityLiving.setLocationAndAngles(pos.getX(), getPos().getY(), pos.getZ(), worldObj.rand.nextFloat() * 360F, 0.0F);
+
+                if (needCorrectLight && canSpawnInLight(entityLiving)) {
+                    continue;
+                }
+
                 entityLiving.getEntityData().setBoolean("IsSoulShard", true);
 
                 entityLiving.rotationYawHead = entityLiving.rotationYaw;
@@ -103,14 +123,23 @@ public class SoulCageTileEntity extends TileEntity implements ITickable {
         int tier = Utils.getTier(soul_shard);
 
         if (spawnDelay == Integer.MAX_VALUE) {
-            spawnDelay = Utils.getTime(tier);
+            spawnDelay = TierUtils.getSpawnDelay(TierUtils.getValidTier(tier));
         }
 
-        boolean needRedstone = Utils.needRedstone(tier);
+        boolean needRedstone = TierUtils.getNeedRedstone(tier);
         boolean isActive = worldObj.isBlockPowered(getPos());
+        boolean needPlayer = TierUtils.getPlayerCheck(tier);
+
 
         if (needRedstone && isActive) {
-            updateDelay();
+            if (needPlayer) {
+                if (worldObj.getClosestPlayer(getPos().getX(), getPos().getY(), getPos().getZ(), 16).getUniqueID().toString().equals(owner.toString()))
+                    updateDelay();
+                else
+                    return;
+            } else {
+                updateDelay();
+            }
             return;
         }
 
@@ -132,7 +161,7 @@ public class SoulCageTileEntity extends TileEntity implements ITickable {
                 return;
 
             int tier = Utils.getTier(soul_shard);
-            boolean needRedstone = Utils.needRedstone(tier);
+            boolean needRedstone = TierUtils.getNeedRedstone(tier);
 
             if (getNearbyEntity((EntityLiving) EntityList.createEntityByName(Utils.getEntityType(soul_shard), worldObj)) >= 80) {
                 worldObj.setBlockState(getPos(), getBlockType().getStateFromMeta(SoulCage.EnumType.INACTIVE_SOULCAGE.getDamage()));
@@ -220,6 +249,14 @@ public class SoulCageTileEntity extends TileEntity implements ITickable {
         this.soul_shard = stack;
     }
 
+    public UUID getOwner() {
+        return owner;
+    }
+
+    public void setOwner(UUID owner) {
+        this.owner = owner;
+    }
+
     /**
      * Tanks modmuss50: (https://github.com/TechReborn/RebornCore/blob/1.8.9/src%2Fmain%2Fjava%2Freborncore%2Fcommon%2Ftile%2FTileMachineBase.java#L74)
      */
@@ -232,5 +269,17 @@ public class SoulCageTileEntity extends TileEntity implements ITickable {
         ItemStack stack = new ItemStack(ItemRegistry.soulShard, 1, soul_shard.getItemDamage());
         stack.setTagCompound(soul_shard.getTagCompound());
         return stack;
+    }
+
+    public boolean canSpawnInLight(EntityLiving living) {
+        int light = worldObj.getLight(getPos());
+
+        if (living instanceof EntityMob || living instanceof IMob)
+            return light <= 8;
+
+        if (living instanceof EntityAnimal || living instanceof IAnimals)
+            return light > 8;
+
+        return true;
     }
 }

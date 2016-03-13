@@ -1,5 +1,6 @@
 package fr.bretzel.soulshard.item;
 
+import fr.bretzel.soulshard.TierUtils;
 import fr.bretzel.soulshard.registry.CommonRegistry;
 import fr.bretzel.soulshard.Utils;
 import net.minecraft.creativetab.CreativeTabs;
@@ -66,7 +67,7 @@ public class SoulShardItem extends Item {
             if (!stack.hasTagCompound()) {
                 Utils.initShard(stack);
                 if (type.getTier() >= 0)
-                    Utils.setKillCount(stack, Utils.getMaxKillForTier(type.getTier()));
+                    Utils.setKillCount(stack, TierUtils.getMobKill(type.getTier()));
 
                 subItems.add(stack);
             }

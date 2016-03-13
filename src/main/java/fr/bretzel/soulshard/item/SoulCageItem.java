@@ -27,13 +27,4 @@ public class SoulCageItem extends ItemBlock {
     public String getUnlocalizedName(ItemStack stack) {
         return super.getUnlocalizedName(stack) + "." + ((IMetaBlockName) this.block).getSpecialName(stack);
     }
-
-    @Override
-    public String getItemStackDisplayName(ItemStack stack) {
-        if (Utils.hasTagCompound(stack) && !Utils.getDisplayName(stack).equals("null")) {
-            return super.getItemStackDisplayName(stack) + " (" + EnumChatFormatting.YELLOW + Utils.getDisplayName(stack) + EnumChatFormatting.RESET + ")";
-        }
-
-        return super.getItemStackDisplayName(stack);
-    }
 }
