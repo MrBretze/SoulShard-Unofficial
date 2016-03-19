@@ -3,8 +3,8 @@
       "modid":"soulshard",
       "name":"Soul Shard",
       "description":"This mod allow to capture a mob",
-      "version":"0.0.0",
-      "mcversion":"1.9",
+      "version":"$version",
+      "mcversion":"$mcversion",
       "url":"",
       "updateUrl":"",
       "authorList":[
@@ -15,8 +15,6 @@
       "screenshots":[
 
       ],
-      "dependencies":[
-
-      ]
+      "dependencies":[]
    }
 ]

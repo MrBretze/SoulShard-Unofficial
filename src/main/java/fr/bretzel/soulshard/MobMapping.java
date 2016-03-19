@@ -31,6 +31,7 @@ public class MobMapping {
             this.world = world;
 
             loadDefaultBlackList();
+
             loadEntityList();
 
             config = new MobConfig(new File(CommonRegistry.configDirectory, "Mob.cfg"));
@@ -42,10 +43,11 @@ public class MobMapping {
     }
 
     private void loadEntityList() {
-
         for (Map.Entry<Class<? extends Entity>, String> entry : EntityList.classToStringMapping.entrySet()) {
-            Entity entity = EntityList.createEntityByName(entry.getValue(), world);
-            if (entityList.contains(entry.getValue())) {
+            Entity entity = createEntityByName(entry.getValue(), world);
+            if (entity == null) {
+                SoulShard.soulLog.info("SoulShard: Skipping mapping for " + entry.getValue() + ": Entity is null");
+            } else if (entityList.contains(entry.getValue())) {
                 SoulShard.soulLog.info("SoulShard: Skipping mapping for " + entry.getValue() + ": already mapped.");
             } else if (!entity.isNonBoss()) {
                 SoulShard.soulLog.info("SoulShard: Skipping mapping for " + entry.getValue() + ": detected as boss.");
@@ -97,6 +99,7 @@ public class MobMapping {
     private void loadDefaultBlackList() {
         addMobBlackListed("Giant");
         addMobBlackListed("Monster");
+        addMobBlackListed("Mob");
     }
 
     public void addMobBlackListed(String entityID) {
@@ -115,5 +118,20 @@ public class MobMapping {
 
     public static boolean isLoaded() {
         return loaded;
+    }
+
+    public static Entity createEntityByName(String p_createEntityByName_0_, World p_createEntityByName_1_) {
+        Entity entity = null;
+
+        Class<Entity> exception = (Class<Entity>) EntityList.stringToClassMapping.get(p_createEntityByName_0_);
+        if (exception != null) {
+            try {
+                entity = (Entity) exception.getConstructor(new Class[]{World.class}).newInstance(p_createEntityByName_1_);
+            } catch (Exception e) {
+            }
+        }
+
+
+        return entity;
     }
 }

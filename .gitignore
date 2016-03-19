@@ -1,30 +1,22 @@
-#eclipse
-.project
-.classpath
-.settings/
-.metadata
-*.launch
-org.*
+# eclipse
 bin
+*.launch
+.settings
+.metadata
+.classpath
+.project
 
-#idea
-*.iml
+# idea
+out
 *.ipr
 *.iws
+*.iml
 .idea
-out
 
-#gradle
+# gradle
 build
 .gradle
-modules
 
-#runtime
+# other
+eclipse
 run
-run_server
-
-#mac
-.DS_Store
-
-#Custom code to inject the the dev environment
-custom

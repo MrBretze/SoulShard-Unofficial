@@ -19,7 +19,6 @@ public class SoulShard {
 
     public static Logger soulLog = FMLLog.getLogger();
     public static MobMapping mobMapping;
-    public static final boolean debug = true;
 
     @SidedProxy(clientSide = "fr.bretzel.soulshard.proxy.ClientProxy", serverSide = "fr.bretzel.soulshard.proxy.CommonProxy")
     public static CommonProxy proxy;

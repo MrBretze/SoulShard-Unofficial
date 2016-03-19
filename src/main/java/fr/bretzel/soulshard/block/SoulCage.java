@@ -4,6 +4,7 @@ package fr.bretzel.soulshard.block;
 import fr.bretzel.soulshard.Utils;
 import fr.bretzel.soulshard.block.meta.IMetaBlockName;
 import fr.bretzel.soulshard.item.SoulShardItem;
+import fr.bretzel.soulshard.registry.BlockRegistry;
 import fr.bretzel.soulshard.registry.CommonRegistry;
 import fr.bretzel.soulshard.tileentity.SoulCageTileEntity;
 
@@ -16,13 +17,17 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.List;
 
@@ -70,10 +75,19 @@ public class SoulCage extends Block implements IMetaBlockName {
         return getDefaultState().withProperty(METADATA, EnumType.byMetadata(damage));
     }
 
+    @Override
+    public boolean isOpaqueCube(IBlockState p_isOpaqueCube_1_) {
+        return false;
+    }
 
     @Override
-    public boolean isFullyOpaque(IBlockState p_isFullyOpaque_1_) {
-        return false;
+    public BlockRenderLayer getBlockLayer() {
+        return BlockRenderLayer.CUTOUT;
+    }
+
+    @Override
+    public EnumBlockRenderType getRenderType(IBlockState p_getRenderType_1_) {
+        return EnumBlockRenderType.MODEL;
     }
 
     @Override
