@@ -6,7 +6,6 @@ import fr.bretzel.soulshard.registry.CommonRegistry;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.boss.IBossDisplayData;
 import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
 
@@ -45,15 +44,13 @@ public class MobMapping {
     private void loadEntityList() {
 
         for (Map.Entry<Class<? extends Entity>, String> entry : EntityList.classToStringMapping.entrySet()) {
+            Entity entity = EntityList.createEntityByName(entry.getValue(), world);
             if (entityList.contains(entry.getValue())) {
                 SoulShard.soulLog.info("SoulShard: Skipping mapping for " + entry.getValue() + ": already mapped.");
-            } else if (IBossDisplayData.class.isAssignableFrom(entry.getKey())) {
+            } else if (!entity.isNonBoss()) {
                 SoulShard.soulLog.info("SoulShard: Skipping mapping for " + entry.getValue() + ": detected as boss.");
                 addMobBlackListed(entry.getValue());
             } else if (EntityLiving.class.isAssignableFrom(entry.getKey())) {
-                if (SoulShard.debug) {
-                    SoulShard.soulLog.info("SoulShard: Mapped new entity " + entry.getValue());
-                }
                 entityList.add(entry.getValue());
             }
         }

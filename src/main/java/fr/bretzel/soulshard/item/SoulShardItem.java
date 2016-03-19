@@ -7,8 +7,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IStringSerializable;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -42,7 +42,7 @@ public class SoulShardItem extends Item {
     @Override
     public String getItemStackDisplayName(ItemStack stack) {
         if (Utils.hasTagCompound(stack) && !Utils.getDisplayName(stack).equals("null")) {
-            return super.getItemStackDisplayName(stack) + " (" + EnumChatFormatting.YELLOW + Utils.getDisplayName(stack) + EnumChatFormatting.RESET + ")";
+            return super.getItemStackDisplayName(stack) + " (" + TextFormatting.YELLOW + Utils.getDisplayName(stack) + TextFormatting.RESET + ")";
         }
 
         return super.getItemStackDisplayName(stack);

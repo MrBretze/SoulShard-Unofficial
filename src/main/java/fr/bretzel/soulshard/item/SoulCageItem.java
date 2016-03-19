@@ -5,7 +5,7 @@ import fr.bretzel.soulshard.block.meta.IMetaBlockName;
 import net.minecraft.block.Block;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.text.TextFormatting;
 
 public class SoulCageItem extends ItemBlock {
 
@@ -31,7 +31,7 @@ public class SoulCageItem extends ItemBlock {
     @Override
     public String getItemStackDisplayName(ItemStack stack) {
         if (Utils.hasTagCompound(stack) && !Utils.getDisplayName(stack).equals("null")) {
-            return super.getItemStackDisplayName(stack) + " (" + EnumChatFormatting.YELLOW + Utils.getDisplayName(stack) + EnumChatFormatting.RESET + ")";
+            return super.getItemStackDisplayName(stack) + " (" + TextFormatting.YELLOW + Utils.getDisplayName(stack) + TextFormatting.RESET + ")";
         }
 
         return super.getItemStackDisplayName(stack);

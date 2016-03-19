@@ -10,6 +10,7 @@ import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -47,7 +48,7 @@ public class CommonEvent {
                 Utils.boundEntity(dead, shardItem);
             }
 
-            int soulStealer = EnchantmentHelper.getEnchantmentLevel(ItemRegistry.soulStealer.effectId, player.getHeldItem());
+            int soulStealer = EnchantmentHelper.getEnchantmentLevel(ItemRegistry.soulStealer, player.getHeldItem(EnumHand.MAIN_HAND));
             SoulShardItem.increaseShardKillCount(shardItem, soulStealer + 1);
         }
     }

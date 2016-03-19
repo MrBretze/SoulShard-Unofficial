@@ -2,12 +2,13 @@ package fr.bretzel.soulshard.enchantment;
 
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnumEnchantmentType;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.util.ResourceLocation;
 
 public class SoulStealer extends Enchantment {
 
-    public SoulStealer(int id, ResourceLocation location, int max, EnumEnchantmentType type) {
-        super(id, location, max, type);
+    public SoulStealer(Rarity rarity, EnumEnchantmentType enumEnchantmentType, EntityEquipmentSlot[] entityEquipmentSlots) {
+        super(rarity, enumEnchantmentType, entityEquipmentSlots);
         setName("soul_shard.soul_stealer");
     }
 

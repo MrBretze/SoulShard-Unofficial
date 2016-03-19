@@ -10,11 +10,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
-import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
+import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class SoulCageTileEntity extends TileEntity implements ITickable {
@@ -47,11 +47,11 @@ public class SoulCageTileEntity extends TileEntity implements ITickable {
     public Packet getDescriptionPacket() {
         NBTTagCompound tagCompound = new NBTTagCompound();
         writeToNBT(tagCompound);
-        return new S35PacketUpdateTileEntity(getPos(), 1, tagCompound);
+        return new SPacketUpdateTileEntity(getPos(), 1, tagCompound);
     }
 
     @Override
-    public void onDataPacket(NetworkManager data, S35PacketUpdateTileEntity packet) {
+    public void onDataPacket(NetworkManager data, SPacketUpdateTileEntity packet) {
         readFromNBT(packet.getNbtCompound());
     }
 
@@ -144,7 +144,8 @@ public class SoulCageTileEntity extends TileEntity implements ITickable {
 
             if (tick <= 0) {
                 updateSecond();
-                worldObj.markBlockForUpdate(getPos());
+                IBlockState state = worldObj.getBlockState(getPos());
+                worldObj.notifyBlockUpdate(getPos(), state, state, 3);
                 markDirty();
                 tick = 20;
             }
@@ -168,7 +169,7 @@ public class SoulCageTileEntity extends TileEntity implements ITickable {
     }
 
     public int getNearbyEntity(EntityLiving entityLiving) {
-        AxisAlignedBB aabb = AxisAlignedBB.fromBounds(getPos().getX() - 16, getPos().getY() - 16, getPos().getZ() - 16, getPos().getX() + 16, getPos().getY() + 16, getPos().getZ() + 16);
+        AxisAlignedBB aabb = new AxisAlignedBB(getPos().getX() - 16, getPos().getY() - 16, getPos().getZ() - 16, getPos().getX() + 16, getPos().getY() + 16, getPos().getZ() + 16);
 
         int mob = 0;
 

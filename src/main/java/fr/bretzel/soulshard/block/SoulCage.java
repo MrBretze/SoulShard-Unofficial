@@ -10,7 +10,7 @@ import fr.bretzel.soulshard.tileentity.SoulCageTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyEnum;
-import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
@@ -20,6 +20,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 
 import java.util.List;
@@ -54,8 +56,8 @@ public class SoulCage extends Block implements IMetaBlockName {
     }
 
     @Override
-    protected BlockState createBlockState() {
-        return new BlockState(this, METADATA);
+    protected BlockStateContainer createBlockState() {
+        return new BlockStateContainer(this, METADATA);
     }
 
     @Override
@@ -68,8 +70,9 @@ public class SoulCage extends Block implements IMetaBlockName {
         return getDefaultState().withProperty(METADATA, EnumType.byMetadata(damage));
     }
 
+
     @Override
-    public boolean isOpaqueCube() {
+    public boolean isFullyOpaque(IBlockState p_isFullyOpaque_1_) {
         return false;
     }
 
@@ -94,7 +97,7 @@ public class SoulCage extends Block implements IMetaBlockName {
     }
 
     @Override
-    public ItemStack getPickBlock(MovingObjectPosition target, World world, BlockPos pos) {
+    public ItemStack getPickBlock(IBlockState state, RayTraceResult result, World world, BlockPos blockPos, EntityPlayer player) {
         return new ItemStack(Item.getItemFromBlock(this), 1, 0);
     }
 
@@ -109,7 +112,7 @@ public class SoulCage extends Block implements IMetaBlockName {
     }
 
     @Override
-    public boolean onBlockActivated(World world, BlockPos blockPos, IBlockState state, EntityPlayer player, EnumFacing facing, float par7, float par8, float par9) {
+    public boolean onBlockActivated(World world, BlockPos blockPos, IBlockState state, EntityPlayer player, EnumHand enumHand, ItemStack itemStack, EnumFacing enumFacing, float p_onBlockActivated_8_, float p_onBlockActivated_9_, float p_onBlockActivated_10_) {
         if (!world.isRemote) {
 
             TileEntity tile = world.getTileEntity(blockPos);
@@ -119,9 +122,9 @@ public class SoulCage extends Block implements IMetaBlockName {
 
             SoulCageTileEntity soulTile = (SoulCageTileEntity) tile;
 
-            if (player.getHeldItem() != null && player.getHeldItem().getItem() instanceof SoulShardItem && soulTile.getSoulShard() == null) {
+            if (player.getHeldItem(EnumHand.MAIN_HAND) != null && player.getHeldItem(EnumHand.MAIN_HAND).getItem() instanceof SoulShardItem && soulTile.getSoulShard() == null) {
 
-                ItemStack soulStack = player.getHeldItem();
+                ItemStack soulStack = player.getHeldItem(EnumHand.MAIN_HAND);
 
                 if (Utils.isBound(soulStack)) {
 
@@ -142,7 +145,7 @@ public class SoulCage extends Block implements IMetaBlockName {
                 }
             }
 
-            if (player.getHeldItem() == null && player.isSneaking()) {
+            if (player.getHeldItem(EnumHand.MAIN_HAND) == null && player.isSneaking()) {
                 if (soulTile.getSoulShard() != null) {
                     world.spawnEntityInWorld(new EntityItem(world, blockPos.getX() + 0.5, blockPos.getY() + 0.6, blockPos.getZ() + 0.5, soulTile.getSoulShardStack()));
                     world.setBlockState(blockPos, getStateFromMeta(EnumType.UNBOUND_SOULCAGE.getDamage()));
