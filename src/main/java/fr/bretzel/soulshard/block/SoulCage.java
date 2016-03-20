@@ -4,7 +4,6 @@ package fr.bretzel.soulshard.block;
 import fr.bretzel.soulshard.Utils;
 import fr.bretzel.soulshard.block.meta.IMetaBlockName;
 import fr.bretzel.soulshard.item.SoulShardItem;
-import fr.bretzel.soulshard.registry.BlockRegistry;
 import fr.bretzel.soulshard.registry.CommonRegistry;
 import fr.bretzel.soulshard.tileentity.SoulCageTileEntity;
 
@@ -17,17 +16,13 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.List;
 
@@ -136,24 +131,22 @@ public class SoulCage extends Block implements IMetaBlockName {
 
             SoulCageTileEntity soulTile = (SoulCageTileEntity) tile;
 
-            if (player.getHeldItem(EnumHand.MAIN_HAND) != null && player.getHeldItem(EnumHand.MAIN_HAND).getItem() instanceof SoulShardItem && soulTile.getSoulShard() == null) {
+            if (itemStack != null && itemStack.getItem() instanceof SoulShardItem && soulTile.getSoulShard() == null) {
 
-                ItemStack soulStack = player.getHeldItem(EnumHand.MAIN_HAND);
+                if (Utils.isBound(itemStack)) {
 
-                if (Utils.isBound(soulStack)) {
-
-                    int tier = Utils.getTier(soulStack);
-                    String entName = Utils.getEntityType(soulStack);
+                    int tier = Utils.getTier(itemStack);
+                    String entName = Utils.getEntityType(itemStack);
 
                     if (tier == 0 || entName.isEmpty() || entName.equals("null"))
                         return false;
 
-                    soulTile.setSoulShard(soulStack);
+                    soulTile.setSoulShard(itemStack);
 
                     world.setBlockState(blockPos, getStateFromMeta(EnumType.INACTIVE_SOULCAGE.getDamage()));
 
                     if (!player.capabilities.isCreativeMode)
-                        soulStack.stackSize--;
+                        itemStack.stackSize--;
 
                     return true;
                 }

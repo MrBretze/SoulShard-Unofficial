@@ -7,6 +7,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
@@ -101,6 +102,14 @@ public class SoulShardItem extends Item {
                     lastResort = stack;
                 } else if (Utils.getEntityType(stack).equals(entity)){
                     return stack;
+                }
+            }
+        }
+
+        if (lastResort == null && player.getHeldItemOffhand() != null) {
+            if (player.getHeldItemOffhand().getItem() instanceof SoulShardItem) {
+                if (!Utils.isBound(player.getHeldItemOffhand())) {
+                    lastResort = player.getHeldItemOffhand();
                 }
             }
         }

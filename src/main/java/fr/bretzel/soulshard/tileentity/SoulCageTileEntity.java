@@ -6,6 +6,7 @@ import fr.bretzel.soulshard.registry.ItemRegistry;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.*;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
@@ -198,6 +199,10 @@ public class SoulCageTileEntity extends TileEntity implements ITickable {
         z = worldObj.rand.nextBoolean() ? -z : z;
 
         BlockPos r = new BlockPos(getPos().getX(), getPos().getY(), getPos().getZ()).add(x, y, z);
+
+        if(worldObj.getBlockState(r).getBlock() != Blocks.air) {
+            return getRandomBlockPos(range);
+        }
 
         if (getPos().distanceSqToCenter(r.getX(), r.getY(), r.getZ()) <= 1)
             return getRandomBlockPos(range);
