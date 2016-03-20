@@ -7,7 +7,7 @@ import fr.bretzel.soulshard.item.SoulShardItem;
 import fr.bretzel.soulshard.registry.CommonRegistry;
 import fr.bretzel.soulshard.tileentity.SoulCageTileEntity;
 
-import net.minecraft.block.Block;
+import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
@@ -26,7 +26,7 @@ import net.minecraft.world.World;
 
 import java.util.List;
 
-public class SoulCage extends Block implements IMetaBlockName {
+public class SoulCage extends BlockContainer implements IMetaBlockName {
 
     public static final PropertyEnum METADATA = PropertyEnum.create("type", SoulCage.EnumType.class);
 
@@ -111,16 +111,6 @@ public class SoulCage extends Block implements IMetaBlockName {
     }
 
     @Override
-    public boolean hasTileEntity(IBlockState state) {
-        return true;
-    }
-
-    @Override
-    public TileEntity createTileEntity(World world, IBlockState state) {
-        return new SoulCageTileEntity();
-    }
-
-    @Override
     public boolean onBlockActivated(World world, BlockPos blockPos, IBlockState state, EntityPlayer player, EnumHand enumHand, ItemStack itemStack, EnumFacing enumFacing, float p_onBlockActivated_8_, float p_onBlockActivated_9_, float p_onBlockActivated_10_) {
         if (!world.isRemote) {
 
@@ -163,6 +153,11 @@ public class SoulCage extends Block implements IMetaBlockName {
             }
         }
         return false;
+    }
+
+    @Override
+    public TileEntity createNewTileEntity(World world, int i) {
+        return new SoulCageTileEntity();
     }
 
     public enum EnumType implements IStringSerializable {
