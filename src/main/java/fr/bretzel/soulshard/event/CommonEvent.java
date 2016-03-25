@@ -15,41 +15,46 @@ import net.minecraft.world.World;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-public class CommonEvent {
+public class CommonEvent
+{
 
-    @SubscribeEvent
-    public void onEntityKill(LivingDeathEvent event) {
+	@SubscribeEvent public void onEntityKill(LivingDeathEvent event)
+	{
 
-        World world = event.entity.getEntityWorld();
+		World world = event.entity.getEntityWorld();
 
-        if (world.isRemote || (!(event.entity instanceof EntityLiving)) || (!(event.source.getEntity() instanceof EntityPlayer)))
-            return;
+		if (world.isRemote || (!(event.entity instanceof EntityLiving)) || (!(event.source
+				.getEntity() instanceof EntityPlayer)))
+			return;
 
-        EntityLiving dead = (EntityLiving) event.entity;
+		EntityLiving dead = (EntityLiving) event.entity;
 
-        if (dead.getEntityData().getBoolean("IsSoulShard"))
-            return;
+		if (dead.getEntityData().getBoolean("IsSoulShard"))
+			return;
 
-        EntityPlayer player = (EntityPlayer) event.source.getEntity();
+		EntityPlayer player = (EntityPlayer) event.source.getEntity();
 
-        String entName = EntityList.getEntityString(dead);
+		String entName = EntityList.getEntityString(dead);
 
-        if (entName == null || entName.isEmpty())
-            return;
+		if (entName == null || entName.isEmpty())
+			return;
 
-        if (SoulShard.mobMapping.isMobBlackListed(entName))
-            return;
+		if (SoulShard.mobMapping.isMobBlackListed(entName))
+			return;
 
-        ItemStack shardItem = SoulShardItem.getShardFromInventory(player, entName);
+		ItemStack shardItem = SoulShardItem.getShardFromInventory(player, entName);
 
-        if (shardItem != null) {
+		if (shardItem != null)
+		{
 
-            if (!Utils.isBound(shardItem)) {
-                Utils.boundEntity(dead, shardItem);
-            }
+			if (!Utils.isBound(shardItem))
+			{
+				Utils.boundEntity(dead, shardItem);
+			}
 
-            int soulStealer = EnchantmentHelper.getEnchantmentLevel(ItemRegistry.soulStealer, player.getHeldItem(EnumHand.MAIN_HAND));
-            SoulShardItem.increaseShardKillCount(shardItem, soulStealer + 1);
-        }
-    }
+			int soulStealer = EnchantmentHelper
+					.getEnchantmentLevel(ItemRegistry.soulStealer, player.getHeldItem(EnumHand.MAIN_HAND));
+			SoulShardItem.increaseShardKillCount(shardItem, soulStealer + 1);
+		}
+	}
 }

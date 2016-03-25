@@ -10,36 +10,33 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import org.apache.logging.log4j.Logger;
 
+@Mod(modid = Reference.MODID, name = Reference.NAME, version = Reference.VERSION, acceptedMinecraftVersions = Reference.MINECRAFT_VERSION) public class SoulShard
+{
 
-@Mod(modid = Reference.MODID, name = Reference.NAME, version = Reference.VERSION, acceptedMinecraftVersions = Reference.MINECRAFT_VERSION)
-public class SoulShard {
+	@Mod.Instance public static SoulShard instance;
 
-    @Mod.Instance
-    public static SoulShard instance;
+	public static Logger soulLog = FMLLog.getLogger();
+	public static MobMapping mobMapping;
 
-    public static Logger soulLog = FMLLog.getLogger();
-    public static MobMapping mobMapping;
+	@SidedProxy(clientSide = "fr.bretzel.soulshard.proxy.ClientProxy", serverSide = "fr.bretzel.soulshard.proxy.CommonProxy") public static CommonProxy proxy;
 
-    @SidedProxy(clientSide = "fr.bretzel.soulshard.proxy.ClientProxy", serverSide = "fr.bretzel.soulshard.proxy.CommonProxy")
-    public static CommonProxy proxy;
+	@Mod.EventHandler public void preInit(FMLPreInitializationEvent event)
+	{
+		proxy.preInit(event);
+	}
 
-    @Mod.EventHandler
-    public void preInit(FMLPreInitializationEvent event) {
-        proxy.preInit(event);
-    }
+	@Mod.EventHandler public void init(FMLInitializationEvent event)
+	{
+		proxy.init(event);
+	}
 
-    @Mod.EventHandler
-    public void init(FMLInitializationEvent event) {
-        proxy.init(event);
-    }
+	@Mod.EventHandler public void postIni(FMLPostInitializationEvent event)
+	{
+		proxy.postInit(event);
+	}
 
-    @Mod.EventHandler
-    public void postIni(FMLPostInitializationEvent event) {
-        proxy.postInit(event);
-    }
-
-    @Mod.EventHandler
-    public void loadWorld(FMLServerStartingEvent event) {
-        proxy.loadWorld(event);
-    }
+	@Mod.EventHandler public void loadWorld(FMLServerStartingEvent event)
+	{
+		proxy.loadWorld(event);
+	}
 }

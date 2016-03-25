@@ -15,35 +15,41 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 
+public class CommonProxy
+{
 
-public class CommonProxy {
+	public void preInit(FMLPreInitializationEvent e)
+	{
+		CommonRegistry.registerConfig(e);
+		CommonRegistry.register();
 
-    public void preInit(FMLPreInitializationEvent e) {
-        CommonRegistry.registerConfig(e);
-        CommonRegistry.register();
+		BlockRegistry.registerBlock();
+		ItemRegistry.registerEnchantems();
+		ItemRegistry.registerItem();
+	}
 
-        BlockRegistry.registerBlock();
-        ItemRegistry.registerEnchantems();
-        ItemRegistry.registerItem();
-    }
+	public void init(FMLInitializationEvent e)
+	{
+		MinecraftForge.EVENT_BUS.register(new CommonEvent());
+	}
 
-    public void init(FMLInitializationEvent e) {
-        MinecraftForge.EVENT_BUS.register(new CommonEvent());
-    }
+	public void postInit(FMLPostInitializationEvent e)
+	{
+		CraftingRegistry.registerCraft();
+	}
 
-    public void postInit(FMLPostInitializationEvent e) {
-        CraftingRegistry.registerCraft();
-    }
+	public void loadWorld(FMLServerStartingEvent event)
+	{
+		SoulShard.mobMapping = getMapping(event.getServer().getEntityWorld());
+		event.registerServerCommand(new SoulShardCommand());
+	}
 
-    public void loadWorld(FMLServerStartingEvent event) {
-        SoulShard.mobMapping = getMapping(event.getServer().getEntityWorld());
-        event.registerServerCommand(new SoulShardCommand());
-    }
-
-    public MobMapping getMapping(World world) {
-        if (!MobMapping.isLoaded()) {
-            return new MobMapping(world);
-        }
-        return SoulShard.mobMapping;
-    }
+	public MobMapping getMapping(World world)
+	{
+		if (!MobMapping.isLoaded())
+		{
+			return new MobMapping(world);
+		}
+		return SoulShard.mobMapping;
+	}
 }

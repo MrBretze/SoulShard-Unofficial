@@ -18,225 +18,261 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class SoulCageTileEntity extends TileEntity implements ITickable {
+public class SoulCageTileEntity extends TileEntity implements ITickable
+{
 
-    private ItemStack soul_shard;
-    private int tick = 0;
-    private int spawnDelay = Integer.MAX_VALUE;
+	private ItemStack soul_shard;
+	private int tick = 0;
+	private int spawnDelay = Integer.MAX_VALUE;
 
-    @Override
-    public void writeToNBT(NBTTagCompound compound) {
-        super.writeToNBT(compound);
+	@Override public void writeToNBT(NBTTagCompound compound)
+	{
+		super.writeToNBT(compound);
 
-        if (soul_shard != null) {
-            NBTTagCompound ntcp = new NBTTagCompound();
-            soul_shard.writeToNBT(ntcp);
-            compound.setTag("SoulShard", ntcp);
-        }
-    }
+		if (soul_shard != null)
+		{
+			NBTTagCompound ntcp = new NBTTagCompound();
+			soul_shard.writeToNBT(ntcp);
+			compound.setTag("SoulShard", ntcp);
+		}
+	}
 
-    @Override
-    public void readFromNBT(NBTTagCompound compound) {
-        super.readFromNBT(compound);
+	@Override public void readFromNBT(NBTTagCompound compound)
+	{
+		super.readFromNBT(compound);
 
-        if (compound.hasKey("SoulShard"))
-            soul_shard = ItemStack.loadItemStackFromNBT(compound.getCompoundTag("SoulShard"));
+		if (compound.hasKey("SoulShard"))
+			soul_shard = ItemStack.loadItemStackFromNBT(compound.getCompoundTag("SoulShard"));
 
-    }
+	}
 
-    @Override
-    public Packet getDescriptionPacket() {
-        NBTTagCompound tagCompound = new NBTTagCompound();
-        writeToNBT(tagCompound);
-        return new SPacketUpdateTileEntity(getPos(), 1, tagCompound);
-    }
+	@Override public Packet getDescriptionPacket()
+	{
+		NBTTagCompound tagCompound = new NBTTagCompound();
+		writeToNBT(tagCompound);
+		return new SPacketUpdateTileEntity(getPos(), 1, tagCompound);
+	}
 
-    @Override
-    public void onDataPacket(NetworkManager data, SPacketUpdateTileEntity packet) {
-        readFromNBT(packet.getNbtCompound());
-    }
+	@Override public void onDataPacket(NetworkManager data, SPacketUpdateTileEntity packet)
+	{
+		readFromNBT(packet.getNbtCompound());
+	}
 
-    public void updateDelay() {
-        spawnDelay--;
+	public void updateDelay()
+	{
+		spawnDelay--;
 
-        int tier = Utils.getTier(soul_shard);
+		int tier = Utils.getTier(soul_shard);
 
-        if (spawnDelay <= 0) {
+		if (spawnDelay <= 0)
+		{
 
-            spawnDelay = Utils.getTime(tier);
-            int b = Utils.getEntitySpawnForTier(tier);
+			spawnDelay = Utils.getTime(tier);
+			int b = Utils.getEntitySpawnForTier(tier);
 
-            for (int i = b; i > 0; i--) {
+			for (int i = b; i > 0; i--)
+			{
 
-                Entity entity = EntityList.createEntityByName(Utils.getEntityType(soul_shard), worldObj);
+				Entity entity = EntityList.createEntityByName(Utils.getEntityType(soul_shard), worldObj);
 
-                if (entity == null && !(entity instanceof EntityLiving)) {
-                    return;
-                }
+				if (entity == null && !(entity instanceof EntityLiving))
+				{
+					return;
+				}
 
-                EntityLiving entityLiving = (EntityLiving) entity;
+				EntityLiving entityLiving = (EntityLiving) entity;
 
-                if (getNearbyEntity(entityLiving) > 80) {
-                    break;
-                }
+				if (getNearbyEntity(entityLiving) > 80)
+				{
+					break;
+				}
 
-                BlockPos pos = getRandomBlockPos(4);
+				BlockPos pos = getRandomBlockPos(4);
 
-                entityLiving.setLocationAndAngles(pos.getX(), getPos().getY(), pos.getZ(), worldObj.rand.nextFloat() * 360F, 0.0F);
-                entityLiving.getEntityData().setBoolean("IsSoulShard", true);
+				entityLiving
+						.setLocationAndAngles(pos.getX(), getPos().getY(), pos.getZ(), worldObj.rand.nextFloat() * 360F,
+								0.0F);
+				entityLiving.getEntityData().setBoolean("IsSoulShard", true);
 
-                entityLiving.rotationYawHead = entityLiving.rotationYaw;
-                entityLiving.renderYawOffset = entityLiving.rotationYaw;
+				entityLiving.rotationYawHead = entityLiving.rotationYaw;
+				entityLiving.renderYawOffset = entityLiving.rotationYaw;
 
-                entityLiving.onInitialSpawn(worldObj.getDifficultyForLocation(getPos()), null);
-                spawnEntity(entityLiving);
-                entityLiving.spawnExplosionParticle();
-            }
-        }
+				entityLiving.onInitialSpawn(worldObj.getDifficultyForLocation(getPos()), null);
+				spawnEntity(entityLiving);
+				entityLiving.spawnExplosionParticle();
+			}
+		}
 
-    }
+	}
 
-    public void updateSecond() {
+	public void updateSecond()
+	{
 
-        if (!Utils.hasTagCompound(soul_shard))
-            return;
+		if (!Utils.hasTagCompound(soul_shard))
+			return;
 
-        int tier = Utils.getTier(soul_shard);
+		int tier = Utils.getTier(soul_shard);
 
-        if (spawnDelay == Integer.MAX_VALUE) {
-            spawnDelay = Utils.getTime(tier);
-        }
+		if (spawnDelay == Integer.MAX_VALUE)
+		{
+			spawnDelay = Utils.getTime(tier);
+		}
 
-        boolean needRedstone = Utils.needRedstone(tier);
-        boolean isActive = worldObj.isBlockPowered(getPos());
+		boolean needRedstone = Utils.needRedstone(tier);
+		boolean isActive = worldObj.isBlockPowered(getPos());
 
-        if (needRedstone && isActive) {
-            updateDelay();
-            return;
-        }
+		if (needRedstone && isActive)
+		{
+			updateDelay();
+			return;
+		}
 
-        if (!needRedstone) {
-            updateDelay();
-            return;
-        }
+		if (!needRedstone)
+		{
+			updateDelay();
+			return;
+		}
 
-        spawnDelay = Integer.MAX_VALUE;
-    }
+		spawnDelay = Integer.MAX_VALUE;
+	}
 
-    @Override
-    public void update() {
-        if (!worldObj.isRemote && soul_shard != null) {
+	@Override public void update()
+	{
+		if (!worldObj.isRemote && soul_shard != null)
+		{
 
-            boolean isActive = worldObj.isBlockPowered(getPos());
+			boolean isActive = worldObj.isBlockPowered(getPos());
 
-            if (!Utils.hasTagCompound(soul_shard))
-                return;
+			if (!Utils.hasTagCompound(soul_shard))
+				return;
 
-            int tier = Utils.getTier(soul_shard);
-            boolean needRedstone = Utils.needRedstone(tier);
+			int tier = Utils.getTier(soul_shard);
+			boolean needRedstone = Utils.needRedstone(tier);
 
-            if (getNearbyEntity((EntityLiving) EntityList.createEntityByName(Utils.getEntityType(soul_shard), worldObj)) >= 80) {
-                worldObj.setBlockState(getPos(), getBlockType().getStateFromMeta(SoulCage.EnumType.INACTIVE_SOULCAGE.getDamage()));
-                tick = 20;
-                return;
-            }
+			if (getNearbyEntity((EntityLiving) EntityList.createEntityByName(Utils.getEntityType(soul_shard), worldObj))
+					>= 80)
+			{
+				worldObj.setBlockState(getPos(),
+						getBlockType().getStateFromMeta(SoulCage.EnumType.INACTIVE_SOULCAGE.getDamage()));
+				tick = 20;
+				return;
+			}
 
-            tick--;
+			tick--;
 
-            if (tick <= 0) {
-                updateSecond();
-                IBlockState state = worldObj.getBlockState(getPos());
-                worldObj.notifyBlockUpdate(getPos(), state, state, 3);
-                markDirty();
-                tick = 20;
-            }
+			if (tick <= 0)
+			{
+				updateSecond();
+				IBlockState state = worldObj.getBlockState(getPos());
+				worldObj.notifyBlockUpdate(getPos(), state, state, 3);
+				markDirty();
+				tick = 20;
+			}
 
-            if (needRedstone && isActive) {
-                if (getBlockMetadata() == 1) {
-                    worldObj.setBlockState(getPos(), getBlockType().getStateFromMeta(SoulCage.EnumType.ACTIVE_SOULCAGE.getDamage()));
-                    return;
-                }
-            }
+			if (needRedstone && isActive)
+			{
+				if (getBlockMetadata() == 1)
+				{
+					worldObj.setBlockState(getPos(),
+							getBlockType().getStateFromMeta(SoulCage.EnumType.ACTIVE_SOULCAGE.getDamage()));
+					return;
+				}
+			}
 
-            if (!needRedstone) {
-                worldObj.setBlockState(getPos(), getBlockType().getStateFromMeta(SoulCage.EnumType.ACTIVE_SOULCAGE.getDamage()));
-                return;
-            }
+			if (!needRedstone)
+			{
+				worldObj.setBlockState(getPos(),
+						getBlockType().getStateFromMeta(SoulCage.EnumType.ACTIVE_SOULCAGE.getDamage()));
+				return;
+			}
 
-            if (getBlockMetadata() == 2 && !isActive) {
-                worldObj.setBlockState(getPos(), getBlockType().getStateFromMeta(SoulCage.EnumType.INACTIVE_SOULCAGE.getDamage()));
-            }
-        }
-    }
+			if (getBlockMetadata() == 2 && !isActive)
+			{
+				worldObj.setBlockState(getPos(),
+						getBlockType().getStateFromMeta(SoulCage.EnumType.INACTIVE_SOULCAGE.getDamage()));
+			}
+		}
+	}
 
-    public int getNearbyEntity(EntityLiving entityLiving) {
-        AxisAlignedBB aabb = new AxisAlignedBB(getPos().getX() - 16, getPos().getY() - 16, getPos().getZ() - 16, getPos().getX() + 16, getPos().getY() + 16, getPos().getZ() + 16);
+	public int getNearbyEntity(EntityLiving entityLiving)
+	{
+		AxisAlignedBB aabb = new AxisAlignedBB(getPos().getX() - 16, getPos().getY() - 16, getPos().getZ() - 16,
+				getPos().getX() + 16, getPos().getY() + 16, getPos().getZ() + 16);
 
-        int mob = 0;
+		int mob = 0;
 
-        for (EntityLiving entity : worldObj.getEntitiesWithinAABB(entityLiving.getClass(), aabb)) {
-            if (entity.getEntityData().getBoolean("IsSoulShard"))
-                mob++;
-        }
+		for (EntityLiving entity : worldObj.getEntitiesWithinAABB(entityLiving.getClass(), aabb))
+		{
+			if (entity.getEntityData().getBoolean("IsSoulShard"))
+				mob++;
+		}
 
-        return mob;
-    }
+		return mob;
+	}
 
-    public Entity spawnEntity(Entity entity) {
-        if (entity.worldObj != null)
-            entity.worldObj.spawnEntityInWorld(entity);
+	public Entity spawnEntity(Entity entity)
+	{
+		if (entity.worldObj != null)
+			entity.worldObj.spawnEntityInWorld(entity);
 
-        return entity;
-    }
+		return entity;
+	}
 
-    public BlockPos getRandomBlockPos(int range) {
+	public BlockPos getRandomBlockPos(int range)
+	{
 
-        int x = worldObj.rand.nextInt(range);
-        int y = 0;
-        int z = worldObj.rand.nextInt(range);
+		int x = worldObj.rand.nextInt(range);
+		int y = 0;
+		int z = worldObj.rand.nextInt(range);
 
-        x = worldObj.rand.nextBoolean() ? -x : x;
-        z = worldObj.rand.nextBoolean() ? -z : z;
+		x = worldObj.rand.nextBoolean() ? -x : x;
+		z = worldObj.rand.nextBoolean() ? -z : z;
 
-        BlockPos r = new BlockPos(getPos().getX(), getPos().getY(), getPos().getZ()).add(x, y, z);
+		BlockPos r = new BlockPos(getPos().getX(), getPos().getY(), getPos().getZ()).add(x, y, z);
 
-        if(worldObj.getBlockState(r).getBlock() != Blocks.air) {
-            return getRandomBlockPos(range);
-        }
+		if (worldObj.getBlockState(r).getBlock() != Blocks.air)
+		{
+			return getRandomBlockPos(range);
+		}
 
-        if (getPos().distanceSqToCenter(r.getX(), r.getY(), r.getZ()) <= 1)
-            return getRandomBlockPos(range);
+		if (getPos().distanceSqToCenter(r.getX(), r.getY(), r.getZ()) <= 1)
+			return getRandomBlockPos(range);
 
-        return r;
-    }
+		return r;
+	}
 
-    public int getTick() {
-        return tick;
-    }
+	public int getTick()
+	{
+		return tick;
+	}
 
-    public int getSpawnDelay() {
-        return spawnDelay;
-    }
+	public int getSpawnDelay()
+	{
+		return spawnDelay;
+	}
 
-    public ItemStack getSoulShard() {
-        return soul_shard;
-    }
+	public ItemStack getSoulShard()
+	{
+		return soul_shard;
+	}
 
-    public void setSoulShard(ItemStack stack) {
-        this.soul_shard = stack;
-    }
+	public void setSoulShard(ItemStack stack)
+	{
+		this.soul_shard = stack;
+	}
 
-    /**
-     * Tanks modmuss50: (https://github.com/TechReborn/RebornCore/blob/1.8.9/src%2Fmain%2Fjava%2Freborncore%2Fcommon%2Ftile%2FTileMachineBase.java#L74)
-     */
-    @Override
-    public boolean shouldRefresh(World world, BlockPos blockPos, IBlockState oldState, IBlockState newState) {
-        return oldState.getBlock() != newState.getBlock();
-    }
+	/**
+	 * Tanks modmuss50: (https://github.com/TechReborn/RebornCore/blob/1.8.9/src%2Fmain%2Fjava%2Freborncore%2Fcommon%2Ftile%2FTileMachineBase.java#L74)
+	 */
+	@Override public boolean shouldRefresh(World world, BlockPos blockPos, IBlockState oldState, IBlockState newState)
+	{
+		return oldState.getBlock() != newState.getBlock();
+	}
 
-    public ItemStack getSoulShardStack() {
-        ItemStack stack = new ItemStack(ItemRegistry.soulShard, 1, soul_shard.getItemDamage());
-        stack.setTagCompound(soul_shard.getTagCompound());
-        return stack;
-    }
+	public ItemStack getSoulShardStack()
+	{
+		ItemStack stack = new ItemStack(ItemRegistry.soulShard, 1, soul_shard.getItemDamage());
+		stack.setTagCompound(soul_shard.getTagCompound());
+		return stack;
+	}
 }
