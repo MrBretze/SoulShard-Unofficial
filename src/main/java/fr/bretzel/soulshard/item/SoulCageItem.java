@@ -5,6 +5,7 @@ import fr.bretzel.soulshard.block.meta.IMetaBlockName;
 import net.minecraft.block.Block;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.text.TextFormatting;
 
 public class SoulCageItem extends ItemBlock
@@ -35,10 +36,15 @@ public class SoulCageItem extends ItemBlock
 
 	@Override public String getItemStackDisplayName(ItemStack stack)
 	{
-		if (Utils.hasTagCompound(stack) && !Utils.getDisplayName(stack).equals("null"))
+		if (Utils.hasTagCompound(stack))
 		{
-			return super.getItemStackDisplayName(stack) + " (" + TextFormatting.YELLOW + Utils.getDisplayName(stack)
-					+ TextFormatting.RESET + ")";
+			NBTTagCompound compound = stack.getTagCompound();
+			if (compound.hasKey("SoulShardTag"))
+			{
+				ItemStack stack1 = ItemStack.loadItemStackFromNBT(compound.getCompoundTag("SoulShardTag"));
+				return super.getItemStackDisplayName(stack) + " (" + TextFormatting.YELLOW + Utils.getDisplayName(stack1)
+						+ TextFormatting.RESET + ")";
+			}
 		}
 
 		return super.getItemStackDisplayName(stack);

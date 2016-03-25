@@ -101,7 +101,7 @@ public class Utils
 
 	public static boolean isSoulShard(ItemStack stack)
 	{
-		return stack.getItem() instanceof SoulShardItem;
+		return stack != null && stack.getItem() != null && stack.getItem() instanceof SoulShardItem;
 	}
 
 	public static boolean isBound(ItemStack stack)

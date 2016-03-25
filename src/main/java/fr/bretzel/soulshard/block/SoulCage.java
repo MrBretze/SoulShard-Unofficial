@@ -1,5 +1,6 @@
 package fr.bretzel.soulshard.block;
 
+import fr.bretzel.soulshard.SoulShard;
 import fr.bretzel.soulshard.Utils;
 import fr.bretzel.soulshard.block.meta.IMetaBlockName;
 import fr.bretzel.soulshard.item.SoulShardItem;
@@ -17,13 +18,17 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class SoulCage extends BlockContainer implements IMetaBlockName
 {
@@ -47,18 +52,32 @@ public class SoulCage extends BlockContainer implements IMetaBlockName
 		{
 			SoulCageTileEntity tileEntity = (SoulCageTileEntity) world.getTileEntity(pos);
 			if (tileEntity.getSoulShard() != null)
-				world.spawnEntityInWorld(new EntityItem(world, pos.getX() + 0.5, pos.getY() + 0.6, pos.getZ() + 0.5,
-						tileEntity.getSoulShardStack()));
+			{
+				ItemStack stack = new ItemStack(Item.getItemFromBlock(state.getBlock()));
+				stack.setItemDamage(EnumType.INACTIVE_SOULCAGE.getDamage());
+
+				if (!stack.hasTagCompound())
+				{
+					stack.setTagCompound(new NBTTagCompound());
+				}
+				stack.getTagCompound().setTag("SoulShardTag", tileEntity.getSoulShardStack().serializeNBT());
+				EntityItem item = new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), stack);
+				world.spawnEntityInWorld(item);
+			}
 			world.removeTileEntity(pos);
 		}
 	}
 
-	@Override public IBlockState onBlockPlaced(World p_onBlockPlaced_1_, BlockPos p_onBlockPlaced_2_,
-			EnumFacing p_onBlockPlaced_3_, float p_onBlockPlaced_4_, float p_onBlockPlaced_5_, float p_onBlockPlaced_6_,
-			int p_onBlockPlaced_7_, EntityLivingBase p_onBlockPlaced_8_)
+	@Override public void onBlockPlacedBy(World world, BlockPos blockPos, IBlockState state, EntityLivingBase player,
+			ItemStack stack)
 	{
-		return super.onBlockPlaced(p_onBlockPlaced_1_, p_onBlockPlaced_2_, p_onBlockPlaced_3_, p_onBlockPlaced_4_,
-				p_onBlockPlaced_5_, p_onBlockPlaced_6_, p_onBlockPlaced_7_, p_onBlockPlaced_8_);
+		super.onBlockPlacedBy(world, blockPos, state, player, stack);
+		if (stack.hasTagCompound() && stack.getTagCompound().hasKey("SoulShardTag") && !world.isRemote)
+		{
+			SoulCageTileEntity tileEntity = (SoulCageTileEntity) world.getTileEntity(blockPos);
+			tileEntity.setSoulShard(
+					ItemStack.loadItemStackFromNBT(stack.getTagCompound().getCompoundTag("SoulShardTag")));
+		}
 	}
 
 	@Override protected BlockStateContainer createBlockState()
@@ -74,6 +93,17 @@ public class SoulCage extends BlockContainer implements IMetaBlockName
 	@Override public IBlockState getStateFromMeta(int damage)
 	{
 		return getDefaultState().withProperty(METADATA, EnumType.byMetadata(damage));
+	}
+
+	@Override public List<ItemStack> getDrops(IBlockAccess blockAccess, BlockPos blockPos, IBlockState blockState,
+			int p_getDrops_4_)
+	{
+		int damage = ((EnumType) blockState.getValue(METADATA)).getDamage();
+
+		if (EnumType.UNBOUND_SOULCAGE.getDamage() == damage)
+			return super.getDrops(blockAccess, blockPos, blockState, p_getDrops_4_);
+
+		return new ArrayList<ItemStack>();
 	}
 
 	@Override public boolean isOpaqueCube(IBlockState p_isOpaqueCube_1_)
@@ -132,7 +162,8 @@ public class SoulCage extends BlockContainer implements IMetaBlockName
 
 			SoulCageTileEntity soulTile = (SoulCageTileEntity) tile;
 
-			if (itemStack != null && itemStack.getItem() instanceof SoulShardItem && soulTile.getSoulShard() == null)
+			if (!player.isSneaking() && itemStack != null && itemStack.getItem() instanceof SoulShardItem
+					&& soulTile.getSoulShard() == null)
 			{
 
 				if (Utils.isBound(itemStack))
@@ -155,13 +186,25 @@ public class SoulCage extends BlockContainer implements IMetaBlockName
 				}
 			}
 
-			if (player.getHeldItem(EnumHand.MAIN_HAND) == null && player.isSneaking())
+			if (itemStack == null && player.isSneaking())
 			{
 				if (soulTile.getSoulShard() != null)
 				{
-					world.spawnEntityInWorld(
-							new EntityItem(world, blockPos.getX() + 0.5, blockPos.getY() + 0.6, blockPos.getZ() + 0.5,
-									soulTile.getSoulShardStack()));
+					Random rand = new Random();
+
+					float dX = rand.nextFloat() * 0.8F + 0.1F;
+					float dZ = rand.nextFloat() * 0.8F + 0.1F;
+
+					EntityItem entityItem = new EntityItem(world, blockPos.getX() + dX, blockPos.getY() + 0.65, blockPos.getZ() + dZ,
+							soulTile.getSoulShardStack());
+
+					float factor = 0.05F;
+					entityItem.motionX = rand.nextGaussian() * factor;
+					entityItem.motionY = rand.nextGaussian() * factor + 0.2F;
+					entityItem.motionZ = rand.nextGaussian() * factor;
+
+					world.spawnEntityInWorld(entityItem);
+
 					world.setBlockState(blockPos, getStateFromMeta(EnumType.UNBOUND_SOULCAGE.getDamage()));
 					soulTile.setSoulShard(null);
 				}

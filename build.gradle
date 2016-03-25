@@ -25,7 +25,7 @@ group= "fr.bretzel.soulshard" // http://maven.apache.org/guides/mini/guide-namin
 archivesBaseName = "SoulShard"
 
 minecraft {
-    version = "1.9-12.16.0.1770-1.9"
+    version = "1.9-12.16.0.1809-1.9"
     runDir = "run"
     
     // the mappings can be changed at any time, and must be in the following format.
