@@ -1,12 +1,11 @@
 package fr.bretzel.soulshard.event;
 
+import fr.bretzel.soulshard.MobMapping;
 import fr.bretzel.soulshard.SoulShard;
 import fr.bretzel.soulshard.Utils;
-import fr.bretzel.soulshard.block.SoulCage;
 import fr.bretzel.soulshard.item.SoulShardItem;
 import fr.bretzel.soulshard.registry.ItemRegistry;
 
-import net.minecraft.block.Block;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
@@ -15,7 +14,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class CommonEvent
@@ -42,14 +40,13 @@ public class CommonEvent
 		if (entName == null || entName.isEmpty())
 			return;
 
-		if (SoulShard.mobMapping.isMobBlackListed(entName))
+		if (MobMapping.isMobBlackListed(entName))
 			return;
 
 		ItemStack shardItem = SoulShardItem.getShardFromInventory(player, entName);
 
 		if (shardItem != null)
 		{
-
 			if (!Utils.isBound(shardItem))
 			{
 				Utils.boundEntity(dead, shardItem);
@@ -59,5 +56,10 @@ public class CommonEvent
 					.getEnchantmentLevel(ItemRegistry.soulStealer, player.getHeldItem(EnumHand.MAIN_HAND));
 			SoulShardItem.increaseShardKillCount(shardItem, soulStealer + 1);
 		}
+	}
+
+	public int getSoulBonnus(int level) {
+		//Default option
+		return level + 1;
 	}
 }

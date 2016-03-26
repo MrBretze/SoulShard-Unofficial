@@ -40,6 +40,17 @@ public class Utils
 			stack.getTagCompound().setString(DISPLAY_NAME, "null");
 		}
 
+		if (!getEntityType(stack).equals("null") && MobMapping.isMobBlackListed(getEntityType(stack))
+				|| !MobMapping.entityList.contains(getEntityType(stack)))
+		{
+			stack.setTagCompound(new NBTTagCompound());
+			stack.getTagCompound().setInteger(KILL_COUNT, 0);
+			stack.getTagCompound().setString(ENTITY_TYPE, "null");
+			stack.getTagCompound().setInteger(TIER, 0);
+			stack.getTagCompound().setString(DISPLAY_NAME, "null");
+			stack.setItemDamage(SoulShardItem.EnumType.UNBOUND.getDamage());
+		}
+
 		int tier = getTier(stack);
 
 		if (getKillCount(stack) >= getMaxKillForTier(tier) && tier <= 5)
@@ -75,8 +86,15 @@ public class Utils
 
 	public static void boundEntity(EntityLiving entityLiving, ItemStack stack)
 	{
-		if (!isSoulShard(stack) || isBound(stack) || SoulShard.mobMapping.isMobBlackListed(entityLiving))
+		if (MobMapping.isMobBlackListed(entityLiving))
 			return;
+
+		SoulShard.soulLog.info("INFO 1");
+
+		if (!isSoulShard(stack) || isBound(stack))
+			return;
+
+		SoulShard.soulLog.info("INFO 2");
 
 		if (stack.getItemDamage() == SoulShardItem.EnumType.UNBOUND.getDamage())
 		{

@@ -20,8 +20,8 @@ public class MobMapping
 
 	private World world;
 
-	private ArrayList<String> blackList = new ArrayList<String>();
-	private ArrayList<String> entityList = new ArrayList<String>();
+	private static ArrayList<String> blackList = new ArrayList<String>();
+	public static ArrayList<String> entityList = new ArrayList<String>();
 
 	private MobConfig config;
 
@@ -77,7 +77,7 @@ public class MobMapping
 				.info("============== TOTAL ENTITY MAPPED: " + format.format(entityList.size()) + " ============");
 		SoulShard.soulLog.info("===================================================");
 		SoulShard.soulLog
-				.info("============ BLACKLISTED ENTITY: " + format.format(blackList.size()) + " ===============");
+				.info("============== BLACKLISTED ENTITY: " + format.format(blackList.size()) + " =============");
 		SoulShard.soulLog.info("===================================================");
 	}
 
@@ -120,7 +120,7 @@ public class MobMapping
 		addMobBlackListed("Mob");
 	}
 
-	public void addMobBlackListed(String entityID)
+	public static void addMobBlackListed(String entityID)
 	{
 		if (EntityList.isStringValidEntityName(entityID) && !blackList.contains(entityID))
 		{
@@ -128,12 +128,12 @@ public class MobMapping
 		}
 	}
 
-	public boolean isMobBlackListed(String name)
+	public static boolean isMobBlackListed(String name)
 	{
 		return blackList.contains(name);
 	}
 
-	public boolean isMobBlackListed(EntityLiving entityLiving)
+	public static boolean isMobBlackListed(EntityLiving entityLiving)
 	{
 		return isMobBlackListed(EntityList.getEntityString(entityLiving));
 	}
